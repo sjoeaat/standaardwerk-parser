@@ -1,0 +1,43 @@
+{
+  "name": "standaardwerk-parser",
+  "version": "1.0.0",
+  "description": "Core parsing engine for industrial step programs",
+  "type": "module",
+  "main": "src/core/AdvancedParser.js",
+  "bin": {
+    "standaardwerk-parse": "cli/parser.js",
+    "standaardwerk-docx": "cli/docx-to-json.js"
+  },
+  "scripts": {
+    "test": "node tests/unit/test-advanced-parser.js",
+    "test:all": "find tests -name '*.js' -exec node {} \\;",
+    "lint": "eslint src/ cli/ tests/",
+    "start": "node cli/parser.js"
+  },
+  "keywords": [
+    "industrial",
+    "automation",
+    "parsing",
+    "tia-portal",
+    "step-program",
+    "docx",
+    "xml"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "mammoth": "^1.9.1",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sjoeaat/standaardwerk-parser.git"
+  }
+}
