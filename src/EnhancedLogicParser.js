@@ -89,7 +89,7 @@ export class EnhancedLogicParser extends LogicParser {
     // Debug output for step parsing
     if (trimmedLine.toLowerCase().includes('schritt') || trimmedLine.toLowerCase().includes('rust') || trimmedLine.toLowerCase().includes('stap')) {
       console.log(`🔍 Trying to parse step on line ${lineNumber}: "${trimmedLine}"`);
-      console.log(`Available step keywords:`, this.syntaxRules.stepKeywords);
+      console.log('Available step keywords:', this.syntaxRules.stepKeywords);
     }
     
     // Check for VON SCHRITT declarations (non-sequential transitions)
@@ -104,7 +104,7 @@ export class EnhancedLogicParser extends LogicParser {
       this.pendingTransitions.push({
         fromStep,
         isOr,
-        conditions: [] // Will be filled by pending conditions
+        conditions: [], // Will be filled by pending conditions
       });
       return true;
     }
@@ -112,15 +112,15 @@ export class EnhancedLogicParser extends LogicParser {
     // Check for step declarations
     const stepPattern = new RegExp(
       `^(${this.syntaxRules.stepKeywords.rest.join('|')}|${this.syntaxRules.stepKeywords.step.join('|')})(?:\\s+(\\d+))?:\\s*(.*)$`, 
-      'i'
+      'i',
     );
     const stepMatch = trimmedLine.match(stepPattern);
     
     if (trimmedLine.toLowerCase().includes('schritt') || trimmedLine.toLowerCase().includes('rust') || trimmedLine.toLowerCase().includes('stap')) {
-      console.log(`🎯 Step pattern source:`, stepPattern.source);
+      console.log('🎯 Step pattern source:', stepPattern.source);
       console.log(`🎯 Testing line: "${trimmedLine}" (length: ${trimmedLine.length})`);
-      console.log(`🎯 Character codes:`, [...trimmedLine].map(c => c.charCodeAt(0)));
-      console.log(`🎯 Step match result:`, stepMatch);
+      console.log('🎯 Character codes:', [...trimmedLine].map(c => c.charCodeAt(0)));
+      console.log('🎯 Step match result:', stepMatch);
     }
 
     if (stepMatch) {
@@ -153,7 +153,7 @@ export class EnhancedLogicParser extends LogicParser {
         this.pendingTransitions = [];
       }
 
-      console.log(`📝 Created step:`, { type, number: stepNumber, description: newStep.description });
+      console.log('📝 Created step:', { type, number: stepNumber, description: newStep.description });
       this.result.steps.push(newStep);
       return true;
     }
@@ -219,7 +219,7 @@ export class EnhancedLogicParser extends LogicParser {
         currentStep.assignments.push({
           variable: variableName,
           value: conditionText.includes('= ') ? conditionText.split('= ')[1].trim() : 'RUHE',
-          lineNumber
+          lineNumber,
         });
       }
     }
@@ -232,14 +232,14 @@ export class EnhancedLogicParser extends LogicParser {
       crossReference = {
         description: crossRefMatch[1].trim(),
         program: crossRefMatch[2].trim(),
-        steps: steps
+        steps: steps,
       };
       
       // Store for validation
       this.crossReferences.set(`${crossReference.program}:${crossReference.steps?.join('+') || 'unknown'}`, {
         ...crossReference,
         lineNumber,
-        validated: false
+        validated: false,
       });
     }
 
@@ -262,7 +262,7 @@ export class EnhancedLogicParser extends LogicParser {
       comparisonData = {
         variable: comparisonMatch[1].trim(),
         operator: comparisonMatch[2],
-        value: comparisonMatch[3].trim().replace(/["']/g, '')
+        value: comparisonMatch[3].trim().replace(/["']/g, ''),
       };
     }
 
@@ -277,7 +277,7 @@ export class EnhancedLogicParser extends LogicParser {
       hasComparison: !!comparisonData,
       comparison: comparisonData,
       lineNumber,
-      operator: isOr ? 'OR' : 'AND'
+      operator: isOr ? 'OR' : 'AND',
     };
 
     // Add condition to appropriate target
@@ -311,13 +311,13 @@ export class EnhancedLogicParser extends LogicParser {
       step.entryConditions.push({
         type: 'group',
         operator: 'OR',
-        conditions: [condition]
+        conditions: [condition],
       });
     } else if (step.entryConditions.length === 0) {
       step.entryConditions.push({
         type: 'group',
         operator: 'AND',
-        conditions: [condition]
+        conditions: [condition],
       });
     } else {
       const lastGroup = step.entryConditions[step.entryConditions.length - 1];
@@ -335,7 +335,7 @@ export class EnhancedLogicParser extends LogicParser {
       currentStep.exitConditions = [{
         type: 'group',
         operator: 'AND',
-        conditions: [...pendingConditions]
+        conditions: [...pendingConditions],
       }];
       pendingConditions.length = 0;
     }
@@ -358,7 +358,7 @@ export class EnhancedLogicParser extends LogicParser {
             type: 'implicit',
             text: `NICHT SCHRITT ${s.number}`,
             negated: true,
-            stepReference: s.number
+            stepReference: s.number,
           }));
       } else if (step.type === 'SCHRITT') {
         // Regular step logic
@@ -379,14 +379,14 @@ export class EnhancedLogicParser extends LogicParser {
                 type: 'implicit',
                 text: `SCHRITT ${transition.fromStep}`,
                 negated: false,
-                stepReference: transition.fromStep
+                stepReference: transition.fromStep,
               },
               {
                 type: 'implicit',
                 text: `NICHT SCHRITT ${transition.fromStep - 1}`,
                 negated: true,
-                stepReference: transition.fromStep - 1
-              }
+                stepReference: transition.fromStep - 1,
+              },
             ];
           }
         });
@@ -408,7 +408,7 @@ export class EnhancedLogicParser extends LogicParser {
         type: 'CROSS_REFERENCE',
         message: `Cross-reference to program '${ref.program}' steps [${ref.steps.join(', ')}] needs validation`,
         lineNumber: ref.lineNumber,
-        severity: 'warning'
+        severity: 'warning',
       });
     });
     
@@ -435,7 +435,7 @@ export class EnhancedLogicParser extends LogicParser {
 
     // Check for TIJD/TIME keywords
     if (this.syntaxRules.variableDetection.timerKeywords.some(keyword =>
-        lowerName.includes(keyword.toLowerCase()))) {
+      lowerName.includes(keyword.toLowerCase()))) {
       return 'tijd';
     }
 
@@ -446,7 +446,7 @@ export class EnhancedLogicParser extends LogicParser {
 
     // Check for MARKER keywords
     if (this.syntaxRules.variableDetection.markerKeywords.some(keyword =>
-        lowerName.includes(keyword.toLowerCase()))) {
+      lowerName.includes(keyword.toLowerCase()))) {
       return 'marker';
     }
 
@@ -464,39 +464,39 @@ export class EnhancedLogicParser extends LogicParser {
           pattern: /^[a-zA-Z][a-zA-Z0-9_]*\\s*=\\s*$/,
           implementation: 'coil', // or 'sr' if SET/RESET table follows
           arrayName: 'Hulp',
-          arrayRange: [1, 32]
+          arrayRange: [1, 32],
         },
         storing: {
           pattern: /^STORING:\\s*[^=]+\\s*=\\s*$/,
           implementation: 'coil',
           arrayName: 'Storing',
-          arrayRange: [1, 32]
+          arrayRange: [1, 32],
         },
         melding: {
           pattern: /^MELDING:\\s*[^=]+\\s*=\\s*$/,
           implementation: 'coil',
           arrayName: 'Melding',
-          arrayRange: [1, 32]
+          arrayRange: [1, 32],
         },
         tijd: {
           pattern: /^TIJD\\s*=\\s*[^=]+$/,
           implementation: 'timer',
           arrayName: 'Tijd',
-          arrayRange: [1, 10]
+          arrayRange: [1, 10],
         },
         teller: {
           pattern: /^Teller\\s*=\\s*[^=]+$/,
           implementation: 'counter',
           arrayName: 'Teller',
-          arrayRange: [1, 10]
+          arrayRange: [1, 10],
         },
         variabele: {
           pattern: /^Variabele\\s*=\\s*[^=]+$/,
           implementation: 'variable',
           arrayName: 'Variable',
-          arrayRange: [1, 32]
-        }
-      }
+          arrayRange: [1, 32],
+        },
+      },
     };
   }
 

@@ -1,7 +1,7 @@
 // Jest setup file
 // Global test configuration and utilities
 
-import { jest } from '@jest/globals';
+import { jest, beforeEach, afterEach } from '@jest/globals';
 
 // Increase timeout for complex parsing operations
 jest.setTimeout(10000);
@@ -38,18 +38,18 @@ global.testUtils = {
     stepKeywords: {
       step: ['STAP', 'SCHRITT', 'STEP'],
       rest: ['RUST', 'RUHE', 'IDLE'],
-      end: ['KLAAR', 'FERTIG', 'END']
+      end: ['KLAAR', 'FERTIG', 'END'],
     },
     variableDetection: {
       timerKeywords: ['TIJD', 'TIME', 'ZEIT'],
       markerKeywords: ['MARKER', 'FLAG', 'MERKER'],
-      storingKeywords: ['STORING', 'FAULT', 'STÖRUNG']
+      storingKeywords: ['STORING', 'FAULT', 'STÖRUNG'],
     },
     conditions: {
       orPrefix: '+',
       notPrefix: ['NIET', 'NICHT', 'NOT'],
-      transitionPrefix: '->'
-    }
+      transitionPrefix: '->',
+    },
   }),
   
   // Create sample validation rules
@@ -57,13 +57,13 @@ global.testUtils = {
     steps: {
       requireDescription: true,
       allowEmptyConditions: false,
-      maxStepsPerProgram: 100
+      maxStepsPerProgram: 100,
     },
     variables: {
       requireTypeDeclaration: false,
-      allowDuplicateNames: false
-    }
-  })
+      allowDuplicateNames: false,
+    },
+  }),
 };
 
 import { expect } from '@jest/globals';
@@ -98,7 +98,7 @@ expect.extend({
         pass: false,
       };
     }
-  }
+  },
 });
 
 // Error suppression for expected errors in tests

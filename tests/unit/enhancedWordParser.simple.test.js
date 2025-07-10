@@ -13,7 +13,7 @@ describe('enhancedWordParser - Simple Tests', () => {
     expect(result).toEqual({
       name: null,
       children: {},
-      programs: []
+      programs: [],
     });
   });
   
@@ -22,8 +22,8 @@ describe('enhancedWordParser - Simple Tests', () => {
       {
         name: 'Test Program',
         folderPath: ['Main', 'Sub'],
-        fbNumber: 100
-      }
+        fbNumber: 100,
+      },
     ];
     
     const result = buildFolderTree(programs);

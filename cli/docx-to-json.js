@@ -9,13 +9,13 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname, basename, extname } from 'path';
 import { fileURLToPath } from 'url';
-import { UnifiedTextParser } from './src/core/UnifiedTextParser.js';
-import { EnhancedParser } from './src/core/EnhancedParser.js';
-import { FlexibleParser } from './src/core/FlexibleParser.js';
-import { AdvancedParser } from './src/core/AdvancedParser.js';
-import { defaultSyntaxRules } from './src/config/syntaxRules.js';
-import { DEFAULT_VALIDATION_RULES } from './src/config/validationRules.js';
-import { DocxParser } from './src/core/DocxParser.js';
+import { UnifiedTextParser } from '../src/UnifiedTextParser.js';
+import { EnhancedParser } from '../src/EnhancedParser.js';
+import { FlexibleParser } from '../src/FlexibleParser.js';
+import { AdvancedParser } from '../src/AdvancedParser.js';
+import { defaultSyntaxRules } from '../src/config/syntaxRules.js';
+import { DEFAULT_VALIDATION_RULES } from '../src/config/validationRules.js';
+import { DocxParser } from '../src/DocxParser.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -34,7 +34,7 @@ const defaultOptions = {
   input: null,
   output: 'training-data.json',
   format: 'suggestions', // or 'structured'
-  parser: 'flexible' // enhanced, flexible, or unified
+  parser: 'flexible', // enhanced, flexible, or unified
 };
 
 // Merge options
@@ -77,7 +77,7 @@ class DocxToJsonConverter {
       // Parse with UnifiedTextParser to get structured data
       const parseResult = this.parser.parseText(docxResult.normalizedText);
       
-      console.log(`📊 Parsing results:`);
+      console.log('📊 Parsing results:');
       console.log(`  Steps: ${parseResult.steps.length}`);
       console.log(`  Variables: ${parseResult.variables.length}`);
       console.log(`  Conditions: ${parseResult.conditions.length}`);
@@ -129,7 +129,7 @@ class DocxToJsonConverter {
           originalLine: variable.name,
           confidence: 0.8,
           frequency: 1,
-          examples: [variable.name]
+          examples: [variable.name],
         });
       }
     });
@@ -143,7 +143,7 @@ class DocxToJsonConverter {
           originalLine: `${step.type} ${step.number}: ${step.description}`,
           confidence: 0.9,
           frequency: 1,
-          examples: [`${step.type} ${step.number}: ${step.description}`]
+          examples: [`${step.type} ${step.number}: ${step.description}`],
         });
       }
     });
@@ -157,7 +157,7 @@ class DocxToJsonConverter {
           originalLine: crossRef.rawText,
           confidence: 0.9,
           frequency: 1,
-          examples: [crossRef.rawText]
+          examples: [crossRef.rawText],
         });
       }
     });
@@ -183,7 +183,7 @@ class DocxToJsonConverter {
           originalLine: condition.rawText,
           confidence: 0.7,
           frequency: 1,
-          examples: [condition.rawText]
+          examples: [condition.rawText],
         });
       }
     });
@@ -192,7 +192,7 @@ class DocxToJsonConverter {
     const groupedSuggestions = this.groupSimilarSuggestions(suggestions);
     
     return {
-      version: "1.0.0",
+      version: '1.0.0',
       generatedAt: new Date().toISOString(),
       sourceFile: docxResult.metadata?.filename || 'unknown',
       summary: {
@@ -200,7 +200,7 @@ class DocxToJsonConverter {
         totalSteps: parseResult.steps.length,
         totalVariables: parseResult.variables.length,
         totalErrors: parseResult.errors.length,
-        totalWarnings: parseResult.warnings.length
+        totalWarnings: parseResult.warnings.length,
       },
       bestSuggestions: groupedSuggestions,
       progressMetrics: [{
@@ -216,11 +216,11 @@ class DocxToJsonConverter {
           errorRate: parseResult.errors.length / Math.max(parseResult.steps.length, 1),
           warningRate: parseResult.warnings.length / Math.max(parseResult.steps.length, 1),
           unknownPatternRate: 0,
-          parsingEfficiency: 0.8
+          parsingEfficiency: 0.8,
         },
         appliedSuggestions: 0,
-        timestamp: new Date().toISOString()
-      }]
+        timestamp: new Date().toISOString(),
+      }],
     };
   }
 
@@ -229,14 +229,14 @@ class DocxToJsonConverter {
    */
   generateStructuredFormat(parseResult, docxResult) {
     return {
-      version: "1.0.0",
+      version: '1.0.0',
       generatedAt: new Date().toISOString(),
       sourceFile: docxResult.metadata?.filename || 'unknown',
       
       rawContent: {
         text: docxResult.rawText,
         normalizedText: docxResult.normalizedText,
-        html: docxResult.html
+        html: docxResult.html,
       },
       
       parsedData: {
@@ -246,7 +246,7 @@ class DocxToJsonConverter {
           description: step.description,
           entryConditions: step.entryConditions || [],
           exitConditions: step.exitConditions || [],
-          lineNumber: step.lineNumber
+          lineNumber: step.lineNumber,
         })),
         
         variables: parseResult.variables.map(variable => ({
@@ -254,7 +254,7 @@ class DocxToJsonConverter {
           type: variable.type,
           group: variable.group,
           conditions: variable.conditions || [],
-          lineNumber: variable.lineNumber
+          lineNumber: variable.lineNumber,
         })),
         
         crossReferences: parseResult.crossReferences || [],
@@ -262,7 +262,7 @@ class DocxToJsonConverter {
         conditions: parseResult.conditions || [],
         
         errors: parseResult.errors,
-        warnings: parseResult.warnings
+        warnings: parseResult.warnings,
       },
       
       statistics: {
@@ -272,8 +272,8 @@ class DocxToJsonConverter {
         totalCrossReferences: parseResult.crossReferences?.length || 0,
         totalConditions: parseResult.conditions?.length || 0,
         totalErrors: parseResult.errors.length,
-        totalWarnings: parseResult.warnings.length
-      }
+        totalWarnings: parseResult.warnings.length,
+      },
     };
   }
 
@@ -290,7 +290,7 @@ class DocxToJsonConverter {
         groups.set(key, {
           ...suggestion,
           frequency: 1,
-          examples: [suggestion.originalLine]
+          examples: [suggestion.originalLine],
         });
       } else {
         const group = groups.get(key);
@@ -342,7 +342,7 @@ async function main() {
       config.input,
       config.output,
       config.format,
-      config.parser
+      config.parser,
     );
 
     console.log('');
@@ -355,7 +355,7 @@ async function main() {
     console.log('🎯 Next Steps:');
     console.log(`  1. Review the generated training data: ${config.output}`);
     console.log(`  2. Generate patterns: node generate-patterns.js --input ${config.output}`);
-    console.log(`  3. Import patterns into your validation config`);
+    console.log('  3. Import patterns into your validation config');
     
   } catch (error) {
     console.error('❌ Conversion failed:', error.message);

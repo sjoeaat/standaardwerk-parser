@@ -26,7 +26,7 @@ export class XmlComparisonValidator {
       conditionPattern: /<Condition[^>]*>([^<]+)<\/Condition>/g,
       
       // Cross-references
-      crossRefPattern: /<Call\s+FB="([^"]+)"\s+Step="([^"]+)"/g
+      crossRefPattern: /<Call\s+FB="([^"]+)"\s+Step="([^"]+)"/g,
     };
     
     // Validation rules
@@ -34,7 +34,7 @@ export class XmlComparisonValidator {
       stepNumberSequence: true,
       variableTypeConsistency: true,
       crossReferenceIntegrity: true,
-      commentPreservation: true
+      commentPreservation: true,
     };
   }
 
@@ -50,9 +50,9 @@ export class XmlComparisonValidator {
       statistics: {
         totalTests: 0,
         passedTests: 0,
-        failedTests: 0
+        failedTests: 0,
       },
-      details: {}
+      details: {},
     };
 
     // Run validation tests
@@ -76,7 +76,7 @@ export class XmlComparisonValidator {
       steps: [],
       variables: [],
       crossReferences: [],
-      comments: []
+      comments: [],
     };
 
     // Extract steps
@@ -84,7 +84,7 @@ export class XmlComparisonValidator {
     while ((match = this.xmlPatterns.stepPattern.exec(xmlContent)) !== null) {
       xmlData.steps.push({
         number: parseInt(match[1]),
-        title: match[0]
+        title: match[0],
       });
     }
 
@@ -95,7 +95,7 @@ export class XmlComparisonValidator {
       const comment = match[2];
       xmlData.comments.push({
         stepNumber,
-        comment: comment.trim()
+        comment: comment.trim(),
       });
     }
 
@@ -104,7 +104,7 @@ export class XmlComparisonValidator {
     while ((match = this.xmlPatterns.variablePattern.exec(xmlContent)) !== null) {
       xmlData.variables.push({
         name: match[1],
-        datatype: match[2]
+        datatype: match[2],
       });
     }
 
@@ -113,7 +113,7 @@ export class XmlComparisonValidator {
     while ((match = this.xmlPatterns.crossRefPattern.exec(xmlContent)) !== null) {
       xmlData.crossReferences.push({
         fb: match[1],
-        step: match[2]
+        step: match[2],
       });
     }
 
@@ -127,7 +127,7 @@ export class XmlComparisonValidator {
     const testName = 'Step Validation';
     validationResult.details[testName] = {
       passed: true,
-      issues: []
+      issues: [],
     };
 
     // Check step count
@@ -140,7 +140,7 @@ export class XmlComparisonValidator {
         type: 'count_mismatch',
         expected: xmlSteps.length,
         actual: parsedSteps.length,
-        message: `Step count mismatch: expected ${xmlSteps.length}, got ${parsedSteps.length}`
+        message: `Step count mismatch: expected ${xmlSteps.length}, got ${parsedSteps.length}`,
       });
     }
 
@@ -155,7 +155,7 @@ export class XmlComparisonValidator {
           type: 'step_number_mismatch',
           expected: xmlStepNumbers[i],
           actual: parsedStepNumbers[i],
-          message: `Step number mismatch at position ${i}: expected ${xmlStepNumbers[i]}, got ${parsedStepNumbers[i]}`
+          message: `Step number mismatch at position ${i}: expected ${xmlStepNumbers[i]}, got ${parsedStepNumbers[i]}`,
         });
       }
     }
@@ -176,7 +176,7 @@ export class XmlComparisonValidator {
     const testName = 'Variable Validation';
     validationResult.details[testName] = {
       passed: true,
-      issues: []
+      issues: [],
     };
 
     const parsedVariables = parseResult.variables || [];
@@ -193,7 +193,7 @@ export class XmlComparisonValidator {
         validationResult.details[testName].issues.push({
           type: 'missing_variable',
           variable: varName,
-          message: `Variable "${varName}" found in XML but not in parsed result`
+          message: `Variable "${varName}" found in XML but not in parsed result`,
         });
       }
     });
@@ -214,7 +214,7 @@ export class XmlComparisonValidator {
     const testName = 'Cross Reference Validation';
     validationResult.details[testName] = {
       passed: true,
-      issues: []
+      issues: [],
     };
 
     const parsedCrossRefs = parseResult.crossReferences || [];
@@ -224,14 +224,14 @@ export class XmlComparisonValidator {
     xmlCrossRefs.forEach(xmlRef => {
       const foundInParsed = parsedCrossRefs.some(pRef => 
         pRef.program && pRef.program.includes(xmlRef.fb) ||
-        pRef.rawText && pRef.rawText.includes(xmlRef.fb)
+        pRef.rawText && pRef.rawText.includes(xmlRef.fb),
       );
 
       if (!foundInParsed) {
         validationResult.details[testName].issues.push({
           type: 'missing_cross_reference',
           reference: xmlRef,
-          message: `Cross-reference to ${xmlRef.fb} SCHRITT ${xmlRef.step} not found in parsed result`
+          message: `Cross-reference to ${xmlRef.fb} SCHRITT ${xmlRef.step} not found in parsed result`,
         });
       }
     });
@@ -257,7 +257,7 @@ export class XmlComparisonValidator {
     const testName = 'Comment Validation';
     validationResult.details[testName] = {
       passed: true,
-      issues: []
+      issues: [],
     };
 
     const parsedComments = parseResult.comments || [];
@@ -266,14 +266,14 @@ export class XmlComparisonValidator {
     // Check if step descriptions are preserved
     xmlComments.forEach(xmlComment => {
       const foundInParsed = parsedComments.some(pComment => 
-        pComment.content && pComment.content.includes(xmlComment.comment.substring(0, 20))
+        pComment.content && pComment.content.includes(xmlComment.comment.substring(0, 20)),
       );
 
       if (!foundInParsed) {
         validationResult.details[testName].issues.push({
           type: 'missing_comment',
           comment: xmlComment,
-          message: `Comment for SCHRITT ${xmlComment.stepNumber} not preserved: "${xmlComment.comment}"`
+          message: `Comment for SCHRITT ${xmlComment.stepNumber} not preserved: "${xmlComment.comment}"`,
         });
       }
     });
@@ -340,7 +340,7 @@ export class XmlComparisonValidator {
         expectedVariables: xmlData.variables.length,
         expectedCrossRefs: xmlData.crossReferences.length,
         xmlContent: xmlContent,
-        validate: (parseResult) => this.validateAgainstXml(parseResult, xmlContent)
+        validate: parseResult => this.validateAgainstXml(parseResult, xmlContent),
       });
     });
 

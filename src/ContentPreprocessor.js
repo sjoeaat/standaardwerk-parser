@@ -20,12 +20,12 @@ export class ContentPreprocessor {
       '&lt;': '<',
       '&gt;': '>',
       '&quot;': '"',
-      '&apos;': "'",
-      '&#39;': "'",
+      '&apos;': '\'',
+      '&#39;': '\'',
       '&nbsp;': ' ',
       '&hellip;': '...',
       '&ndash;': '–',
-      '&mdash;': '—'
+      '&mdash;': '—',
     };
     
     // Performance optimizations - use global regex cache
@@ -48,7 +48,7 @@ export class ContentPreprocessor {
       
       // Common line break issues
       brokenCondition: /^(.+)\s+(&|UND|AND|ODER|OR)\s*$/,
-      conditionContinuation: /^(&|UND|AND|ODER|OR)\s+(.+)$/
+      conditionContinuation: /^(&|UND|AND|ODER|OR)\s+(.+)$/,
     };
   }
 
@@ -317,7 +317,7 @@ export class ContentPreprocessor {
       processedLines: processedLines.length,
       reductionRatio: (originalLines.length - processedLines.length) / originalLines.length,
       htmlEntitiesFound: this.countHtmlEntities(originalContent),
-      processedAt: new Date().toISOString()
+      processedAt: new Date().toISOString(),
     };
   }
 

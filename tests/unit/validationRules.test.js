@@ -7,7 +7,7 @@ import {
   validateCrossReference,
   exportValidationRules,
   importValidationRules,
-  mergeValidationRules
+  mergeValidationRules,
 } from '../../src/config/validationRules.js';
 
 describe('validationRules Configuration', () => {
@@ -61,7 +61,7 @@ describe('validationRules Configuration', () => {
           { input: 'Bereit System =', expected: true },
           { input: 'Ready to start =', expected: true },
           { input: 'STORING: Error =', expected: false }, // Should be excluded
-          { input: 'TIJD =', expected: false } // Should be excluded
+          { input: 'TIJD =', expected: false }, // Should be excluded
         ];
         
         testCases.forEach(({ input, expected }) => {
@@ -90,7 +90,7 @@ describe('validationRules Configuration', () => {
           { input: 'FAULT: System failure =', expected: true },
           { input: 'Tank Störung =', expected: true },
           { input: 'E01 Alarm =', expected: true },
-          { input: 'Normal variable =', expected: false }
+          { input: 'Normal variable =', expected: false },
         ];
         
         testCases.forEach(({ input, expected }) => {
@@ -108,7 +108,7 @@ describe('validationRules Configuration', () => {
           { input: 'MESSAGE: Status update =', expected: true },
           { input: 'Info display active =', expected: true },
           { input: 'System Nachricht =', expected: true },
-          { input: 'Normal variable =', expected: false }
+          { input: 'Normal variable =', expected: false },
         ];
         
         testCases.forEach(({ input, expected }) => {
@@ -125,7 +125,7 @@ describe('validationRules Configuration', () => {
           { input: 'TIJD = 100s', expected: true },
           { input: 'TIME = PT5M', expected: true },
           { input: 'ZEIT = 30', expected: true },
-          { input: 'Regular = value', expected: false }
+          { input: 'Regular = value', expected: false },
         ];
         
         testCases.forEach(({ input, expected }) => {
@@ -176,7 +176,7 @@ describe('validationRules Configuration', () => {
       const testCases = [
         'Condition (Program SCHRITT 5)',
         'Check (FB102 STEP 3+5+7)',
-        'Reference (Test STAP 10)'
+        'Reference (Test STAP 10)',
       ];
       
       testCases.forEach(testCase => {
@@ -203,7 +203,7 @@ describe('validationRules Configuration', () => {
         { input: '+ VON SCHRITT 5', expected: true },
         { input: 'VON STEP 10', expected: true },
         { input: '+ VON STAP 3', expected: true },
-        { input: 'Invalid transition', expected: false }
+        { input: 'Invalid transition', expected: false },
       ];
       
       testCases.forEach(({ input, expected }) => {
@@ -237,7 +237,7 @@ describe('validationRules Configuration', () => {
         { input: 'TIJD 300Sek ??', expected: true },
         { input: 'TIME 5Min ??', expected: true },
         { input: 'ZEIT 60s ??', expected: true },
-        { input: 'Invalid timer', expected: false }
+        { input: 'Invalid timer', expected: false },
       ];
       
       testCases.forEach(({ input, expected }) => {
@@ -252,7 +252,7 @@ describe('validateVariableDefinition', () => {
     const definition = {
       name: 'Freigabe Tank A =',
       conditions: ['Tank ready', 'Process active'],
-      lineNumber: 10
+      lineNumber: 10,
     };
     
     const result = validateVariableDefinition(definition);
@@ -267,7 +267,7 @@ describe('validateVariableDefinition', () => {
     const definition = {
       name: 'Test Variable =',
       conditions: [],
-      lineNumber: 20
+      lineNumber: 20,
     };
     
     const result = validateVariableDefinition(definition);
@@ -281,7 +281,7 @@ describe('validateVariableDefinition', () => {
     const definition = {
       name: 'Test Variable =',
       conditions: Array(25).fill('Condition'),
-      lineNumber: 30
+      lineNumber: 30,
     };
     
     const result = validateVariableDefinition(definition);
@@ -294,7 +294,7 @@ describe('validateVariableDefinition', () => {
     const definition = {
       name: 'Unknown type',
       conditions: [],
-      lineNumber: 40
+      lineNumber: 40,
     };
     
     const result = validateVariableDefinition(definition);
@@ -315,7 +315,7 @@ describe('determineVariableGroup', () => {
       { name: 'Teller = 5', expected: 'teller' },
       { name: 'Variabele = 42', expected: 'variabele' },
       { name: 'Freigabe System =', expected: 'hulpmerker' },
-      { name: 'Tank Störung =', expected: 'storing' }
+      { name: 'Tank Störung =', expected: 'storing' },
     ];
     
     testCases.forEach(({ name, expected }) => {
@@ -342,7 +342,7 @@ describe('validateStepDefinition', () => {
       type: 'RUST',
       number: 0,
       entryConditions: [],
-      lineNumber: 10
+      lineNumber: 10,
     };
     
     const result = validateStepDefinition(step);
@@ -357,7 +357,7 @@ describe('validateStepDefinition', () => {
       type: 'RUST',
       number: 0,
       entryConditions: ['Invalid condition'],
-      lineNumber: 20
+      lineNumber: 20,
     };
     
     const result = validateStepDefinition(step);
@@ -371,7 +371,7 @@ describe('validateStepDefinition', () => {
       type: 'SCHRITT',
       number: 5,
       entryConditions: ['Valid entry'],
-      lineNumber: 30
+      lineNumber: 30,
     };
     
     const result = validateStepDefinition(step);
@@ -386,7 +386,7 @@ describe('validateCrossReference', () => {
     const crossRef = {
       program: 'FB999',
       steps: [1, 2, 3],
-      lineNumber: 10
+      lineNumber: 10,
     };
     
     const availablePrograms = new Map();
@@ -400,7 +400,7 @@ describe('validateCrossReference', () => {
     const crossRef = {
       program: 'FB100',
       steps: [1, 2],
-      lineNumber: 20
+      lineNumber: 20,
     };
     
     const availablePrograms = new Map();
@@ -410,9 +410,9 @@ describe('validateCrossReference', () => {
         ...DEFAULT_VALIDATION_RULES.crossReferenceValidation,
         validation: {
           requiresProgramExists: true,
-          requiresStepsExist: false
-        }
-      }
+          requiresStepsExist: false,
+        },
+      },
     };
     
     const result = validateCrossReference(crossRef, availablePrograms, customRules);
@@ -435,7 +435,7 @@ describe('exportValidationRules', () => {
   test('should export custom rules', () => {
     const customRules = {
       version: '2.0.0',
-      groups: { test: { name: 'Test' } }
+      groups: { test: { name: 'Test' } },
     };
     
     const exported = exportValidationRules(customRules);
@@ -451,7 +451,7 @@ describe('importValidationRules', () => {
     const validJson = JSON.stringify({
       groups: { test: {} },
       stepValidation: {},
-      crossReferenceValidation: {}
+      crossReferenceValidation: {},
     });
     
     const imported = importValidationRules(validJson);
@@ -477,8 +477,8 @@ describe('mergeValidationRules', () => {
     const customRules = {
       version: '2.0.0',
       groups: {
-        customGroup: { name: 'Custom' }
-      }
+        customGroup: { name: 'Custom' },
+      },
     };
     
     const merged = mergeValidationRules(customRules);
@@ -491,8 +491,8 @@ describe('mergeValidationRules', () => {
   test('should override existing groups', () => {
     const customRules = {
       groups: {
-        hulpmerker: { name: 'Modified Hulpmerker' }
-      }
+        hulpmerker: { name: 'Modified Hulpmerker' },
+      },
     };
     
     const merged = mergeValidationRules(customRules);

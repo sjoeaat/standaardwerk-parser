@@ -24,7 +24,7 @@ describe('FlexibleParser', () => {
     });
 
     test('should provide normalized line count', () => {
-      const input = `Line 1\nLine 2\nLine 3`;
+      const input = 'Line 1\nLine 2\nLine 3';
       const result = parser.parse(input);
       
       expect(result.parsingMetadata.normalizedLineCount).toBe(3);

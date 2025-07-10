@@ -25,7 +25,7 @@ export class DocxParser {
       indentLevel2: ['    ', ''],
       indentLevel3: ['      ', ''],
       table: ['|', '|'],
-      tableHeader: ['|**', '**|']
+      tableHeader: ['|**', '**|'],
     };
   }
 
@@ -39,7 +39,7 @@ export class DocxParser {
       // Parse with mammoth to get both text and HTML concurrently
       const [textResult, htmlResult] = await Promise.all([
         mammoth.extractRawText({ buffer }),
-        mammoth.convertToHtml({ buffer })
+        mammoth.convertToHtml({ buffer }),
       ]);
       
       // Extract structured content with formatting (async)
@@ -56,8 +56,8 @@ export class DocxParser {
         metadata: {
           source: 'docx',
           filename: filePath.split('/').pop(),
-          processingTimestamp: new Date().toISOString()
-        }
+          processingTimestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       throw new Error(`Failed to parse DOCX file: ${error.message}`);
@@ -68,7 +68,7 @@ export class DocxParser {
    * Extract structured content from HTML with formatting information - async optimized
    */
   async extractStructuredContentAsync(html, rawText) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       // Run extraction in chunks to avoid blocking
       setImmediate(() => {
         const result = this.extractStructuredContent(html, rawText);
@@ -85,7 +85,7 @@ export class DocxParser {
       sections: [],
       tables: [],
       lists: [],
-      formattedElements: []
+      formattedElements: [],
     };
 
     // Ensure html is a string
@@ -118,7 +118,7 @@ export class DocxParser {
           title: text,
           content: [],
           lineNumber,
-          formatting: { type: 'header', level }
+          formatting: { type: 'header', level },
         };
         content.sections.push(currentSection);
         return;
@@ -134,7 +134,7 @@ export class DocxParser {
           text,
           formatting,
           lineNumber,
-          indentLevel: this.calculateIndentLevel(paragraphMatch[1])
+          indentLevel: this.calculateIndentLevel(paragraphMatch[1]),
         };
 
         if (currentSection) {
@@ -150,7 +150,7 @@ export class DocxParser {
         currentTable = {
           rows: [],
           lineNumber,
-          formatting: { type: 'table' }
+          formatting: { type: 'table' },
         };
         content.tables.push(currentTable);
         return;
@@ -161,7 +161,7 @@ export class DocxParser {
         currentTable.rows.push({
           cells,
           lineNumber,
-          isHeader: trimmed.includes('<th>')
+          isHeader: trimmed.includes('<th>'),
         });
         return;
       }
@@ -172,7 +172,7 @@ export class DocxParser {
           type: trimmed.includes('<ul>') ? 'unordered' : 'ordered',
           items: [],
           lineNumber,
-          formatting: { type: 'list' }
+          formatting: { type: 'list' },
         };
         content.lists.push(currentList);
         return;
@@ -186,7 +186,7 @@ export class DocxParser {
           text,
           formatting,
           lineNumber,
-          indentLevel: this.calculateIndentLevel(trimmed)
+          indentLevel: this.calculateIndentLevel(trimmed),
         });
       }
     });
@@ -202,7 +202,7 @@ export class DocxParser {
       sections: [],
       tables: [],
       lists: [],
-      formattedElements: []
+      formattedElements: [],
     };
 
     if (!rawText || typeof rawText !== 'string') {
@@ -223,7 +223,7 @@ export class DocxParser {
         text: trimmed,
         formatting: { bold: false, italic: false, underline: false },
         lineNumber,
-        indentLevel: this.calculateTextIndentLevel(line)
+        indentLevel: this.calculateTextIndentLevel(line),
       };
 
       content.formattedElements.push(element);
@@ -249,7 +249,7 @@ export class DocxParser {
       italic: html.includes('<em>') || html.includes('<i>'),
       underline: html.includes('<u>'),
       strikethrough: html.includes('<s>') || html.includes('<del>'),
-      styles: []
+      styles: [],
     };
 
     // Extract specific styles
@@ -313,7 +313,7 @@ export class DocxParser {
       cells.push({
         text,
         formatting,
-        isHeader: cellHtml.includes('<th>')
+        isHeader: cellHtml.includes('<th>'),
       });
     });
 
@@ -331,7 +331,7 @@ export class DocxParser {
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
+      .replace(/&#39;/g, '\'')
       .trim();
   }
 
@@ -339,7 +339,7 @@ export class DocxParser {
    * Convert structured content to normalized text with formatting markers - async optimized
    */
   async convertToNormalizedTextAsync(structuredContent) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       // Run conversion in chunks to avoid blocking
       setImmediate(() => {
         const result = this.convertToNormalizedText(structuredContent);
@@ -444,7 +444,7 @@ export class DocxParser {
       steps: [],
       variables: [],
       conditions: [],
-      metadata: {}
+      metadata: {},
     };
 
     // Look for program title (usually first header)
@@ -456,7 +456,7 @@ export class DocxParser {
     // Process all content looking for RUST/SCHRITT patterns
     const allContent = [
       ...structuredContent.sections.flatMap(s => s.content),
-      ...structuredContent.formattedElements
+      ...structuredContent.formattedElements,
     ];
 
     allContent.forEach(element => {
@@ -468,7 +468,7 @@ export class DocxParser {
           text,
           formatting: element.formatting,
           indentLevel: element.indentLevel,
-          lineNumber: element.lineNumber
+          lineNumber: element.lineNumber,
         });
       }
       // Check for variable declarations
@@ -477,7 +477,7 @@ export class DocxParser {
           text,
           formatting: element.formatting,
           indentLevel: element.indentLevel,
-          lineNumber: element.lineNumber
+          lineNumber: element.lineNumber,
         });
       }
       // Check for conditions (indented lines, starting with -, +, etc.)
@@ -486,7 +486,7 @@ export class DocxParser {
           text,
           formatting: element.formatting,
           indentLevel: element.indentLevel,
-          lineNumber: element.lineNumber
+          lineNumber: element.lineNumber,
         });
       }
     });
@@ -509,8 +509,8 @@ export class DocxParser {
         ...docxResult.metadata,
         extractedSteps: stepProgram.steps.length,
         extractedVariables: stepProgram.variables.length,
-        extractedConditions: stepProgram.conditions.length
-      }
+        extractedConditions: stepProgram.conditions.length,
+      },
     };
   }
 }

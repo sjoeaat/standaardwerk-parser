@@ -89,8 +89,8 @@ export class LogicParser {
         totalConditions: 0,
         totalVariables: 0,
         externalReferences: 0,
-        complexityScore: 0
-      }
+        complexityScore: 0,
+      },
     };
   }
 
@@ -148,7 +148,7 @@ export class LogicParser {
     // Check voor step keywords die NIET aan het begin staan
     const stepKeywords = [
       ...this.syntaxRules.stepKeywords.rest,
-      ...this.syntaxRules.stepKeywords.step
+      ...this.syntaxRules.stepKeywords.step,
     ];
     
     for (const keyword of stepKeywords) {
@@ -177,7 +177,7 @@ export class LogicParser {
         name: variableMatch[1],
         type: this.detectVariableType(variableMatch[1]),
         conditions: [],
-        lineNumber
+        lineNumber,
       };
 
       this.addVariableToResult(newVariable);
@@ -199,7 +199,7 @@ export class LogicParser {
     // Moet beginnen met step keyword gevolgd door : of nummer:
     const stepPattern = new RegExp(
       `^(${this.syntaxRules.stepKeywords.rest.join('|')}|${this.syntaxRules.stepKeywords.step.join('|')})(?:\\s*(\\d+))?\\s*[:]\\s*(.*)$`, 
-      'i'
+      'i',
     );
     const stepMatch = trimmedLine.match(stepPattern);
     
@@ -267,7 +267,7 @@ export class LogicParser {
       comparisonData = {
         variable: comparisonMatch[1].trim(),
         operator: comparisonMatch[2],
-        value: comparisonMatch[3].trim().replace(/["']/g, '')
+        value: comparisonMatch[3].trim().replace(/["']/g, ''),
       };
     }
 
@@ -279,7 +279,7 @@ export class LogicParser {
       hasComparison: !!comparisonData,
       comparison: comparisonData,
       lineNumber,
-      operator: isOr ? 'OR' : 'AND'
+      operator: isOr ? 'OR' : 'AND',
     };
 
     // Voeg condition toe aan juiste target
@@ -305,13 +305,13 @@ export class LogicParser {
       step.transitionConditions.push({
         type: 'group',
         operator: 'OR',
-        conditions: [condition]
+        conditions: [condition],
       });
     } else if (step.transitionConditions.length === 0) {
       step.transitionConditions.push({
         type: 'group',
         operator: 'AND',
-        conditions: [condition]
+        conditions: [condition],
       });
     } else {
       const lastGroup = step.transitionConditions[step.transitionConditions.length - 1];
@@ -334,7 +334,7 @@ export class LogicParser {
     
     // Detecteer markers
     if (this.syntaxRules.variableDetection.markerKeywords.some(keyword => 
-        text.includes(keyword.toLowerCase()))) {
+      text.includes(keyword.toLowerCase()))) {
       const markerName = this.extractVariableName(condition.text, 'marker');
       if (markerName && !step.markers.includes(markerName)) {
         step.markers.push(markerName);
@@ -343,7 +343,7 @@ export class LogicParser {
     
     // Detecteer storingen
     if (this.syntaxRules.variableDetection.storingKeywords.some(keyword => 
-        text.includes(keyword.toLowerCase()))) {
+      text.includes(keyword.toLowerCase()))) {
       const storingName = this.extractVariableName(condition.text, 'storing');
       if (storingName && !step.storingen.includes(storingName)) {
         step.storingen.push(storingName);
@@ -357,7 +357,7 @@ export class LogicParser {
     return words.find(word => 
       word.length > 2 && 
       /^[a-zA-Z]/.test(word) && 
-      !['NIET', 'NOT', 'NICHT', 'EN', 'AND', 'OF', 'OR'].includes(word.toUpperCase())
+      !['NIET', 'NOT', 'NICHT', 'EN', 'AND', 'OF', 'OR'].includes(word.toUpperCase()),
     ) || `${type}_variabele`;
   }
 
@@ -366,17 +366,17 @@ export class LogicParser {
     const lowerName = name.toLowerCase();
 
     if (this.syntaxRules.variableDetection.storingKeywords.some(keyword =>
-        lowerName.startsWith(keyword.toLowerCase()))) {
+      lowerName.startsWith(keyword.toLowerCase()))) {
       return 'storing';
     }
 
     if (this.syntaxRules.variableDetection.timerKeywords.some(keyword =>
-        lowerName.includes(keyword.toLowerCase()))) {
+      lowerName.includes(keyword.toLowerCase()))) {
       return 'timer';
     }
 
     if (this.syntaxRules.variableDetection.markerKeywords.some(keyword =>
-        lowerName.includes(keyword.toLowerCase()))) {
+      lowerName.includes(keyword.toLowerCase()))) {
       return 'marker';
     }
 
@@ -407,7 +407,7 @@ export class LogicParser {
       currentStep.transitionConditions = [{
         type: 'group',
         operator: 'AND',
-        conditions: [...pendingConditions]
+        conditions: [...pendingConditions],
       }];
       pendingConditions.length = 0;
     }
@@ -418,7 +418,7 @@ export class LogicParser {
       ...this.result.variables,
       ...this.result.timers,
       ...this.result.markers,
-      ...this.result.storingen
+      ...this.result.storingen,
     ];
     return allVariables[allVariables.length - 1] || null;
   }
@@ -439,7 +439,7 @@ export class LogicParser {
       this.result.statistics.totalSteps * 2 +
       this.result.statistics.totalConditions * 1.5 +
       this.result.statistics.totalVariables * 1.2 +
-      this.result.statistics.externalReferences * 3
+      this.result.statistics.externalReferences * 3,
     );
   }
 }

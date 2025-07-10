@@ -70,7 +70,7 @@ export class AdvancedParser extends FlexibleParser {
       timePattern: /^Zeit\s+(\d+)\s*(sek|min|sec|seconds?|minutes?)\s*\?\?$/i,
       
       // Negation patterns
-      negationPattern: /^(NICHT|NOT)\s+(.+)$/i
+      negationPattern: /^(NICHT|NOT)\s+(.+)$/i,
     };
     
     // Program structure tracking - optimized with efficient data structures
@@ -83,7 +83,7 @@ export class AdvancedParser extends FlexibleParser {
       programTypeIndex: new Map(), // programType -> Set of programs
       stepNumberIndex: new Map(),  // stepNumber -> Set of steps
       entityTypeIndex: new Map(),  // entityType -> Set of entities
-      lineNumberIndex: new Map()   // lineNumber -> element
+      lineNumberIndex: new Map(),   // lineNumber -> element
     };
     
     // TIA Portal standard variables
@@ -91,7 +91,7 @@ export class AdvancedParser extends FlexibleParser {
       { name: 'Stap', datatype: 'Array[0..31] of Bool', description: 'Step status bits' },
       { name: 'Hulp', datatype: 'Array[1..32] of Bool', description: 'Helper bits' },
       { name: 'Tijd', datatype: 'Array[1..10] of IEC_TIMER', description: 'Timer array' },
-      { name: 'Teller', datatype: 'Array[1..10] of Int', description: 'Counter array' }
+      { name: 'Teller', datatype: 'Array[1..10] of Int', description: 'Counter array' },
     ];
   }
 
@@ -141,7 +141,7 @@ export class AdvancedParser extends FlexibleParser {
       orBlocks: [],
       entities: [],
       normalizedReferences: [],
-      compoundConditions: []
+      compoundConditions: [],
     };
   }
 
@@ -152,7 +152,7 @@ export class AdvancedParser extends FlexibleParser {
     return {
       currentProgram: null,
       currentOrBlock: null,
-      lineIndex: 0
+      lineIndex: 0,
     };
   }
 
@@ -181,7 +181,7 @@ export class AdvancedParser extends FlexibleParser {
       () => this.processReference(trimmed, lineNumber, enhanced),
       () => this.processEntity(trimmed, lineNumber, enhanced),
       () => this.processTransitionRule(trimmed, lineNumber, enhanced),
-      () => this.processCondition(trimmed, lineNumber, enhanced)
+      () => this.processCondition(trimmed, lineNumber, enhanced),
     ];
 
     // Try each detector until one succeeds
@@ -336,7 +336,7 @@ export class AdvancedParser extends FlexibleParser {
       lineNumber,
       steps: [],
       assignments: [],
-      references: []
+      references: [],
     };
   }
 
@@ -353,12 +353,12 @@ export class AdvancedParser extends FlexibleParser {
         arrayName,
         indices: [
           { property: arrayName, index: index1 },
-          { property: property1, index: index2 }
+          { property: property1, index: index2 },
         ],
         finalProperty: property2,
         value: value.trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -373,7 +373,7 @@ export class AdvancedParser extends FlexibleParser {
         property,
         value: value.trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -387,7 +387,7 @@ export class AdvancedParser extends FlexibleParser {
         description: description.trim(),
         value: value.trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -404,7 +404,7 @@ export class AdvancedParser extends FlexibleParser {
         name: name.trim(),
         value: value.trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -423,7 +423,7 @@ export class AdvancedParser extends FlexibleParser {
         subtype: 'single_line',
         content: match[1].trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -435,7 +435,7 @@ export class AdvancedParser extends FlexibleParser {
         subtype: 'multi_line',
         content: match[1].trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -448,7 +448,7 @@ export class AdvancedParser extends FlexibleParser {
         content: match[2].trim(),
         codeContent: match[1].trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -467,9 +467,9 @@ export class AdvancedParser extends FlexibleParser {
           type: 'or_block',
           items: [],
           startLine: lineNumber,
-          endLine: null
+          endLine: null,
         },
-        completed: false
+        completed: false,
       };
     }
 
@@ -479,7 +479,7 @@ export class AdvancedParser extends FlexibleParser {
       return {
         isOrBlock: true,
         orBlock: currentOrBlock,
-        completed: true
+        completed: true,
       };
     }
 
@@ -490,12 +490,12 @@ export class AdvancedParser extends FlexibleParser {
         currentOrBlock.items.push({
           condition: match[1].trim(),
           lineNumber,
-          originalText: text
+          originalText: text,
         });
         return {
           isOrBlock: true,
           orBlock: currentOrBlock,
-          completed: false
+          completed: false,
         };
       }
     }
@@ -520,7 +520,7 @@ export class AdvancedParser extends FlexibleParser {
         steps: steps.split('+').map(s => parseInt(s.trim())),
         standardizedFormat: `${fbNumber}.${stepKeyword} ${steps}`,
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -537,7 +537,7 @@ export class AdvancedParser extends FlexibleParser {
         steps: steps.split('+').map(s => parseInt(s.trim())),
         standardizedFormat: `${this.programStructure.currentFB || 'UNKNOWN'}.${stepKeyword} ${steps}`,
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -557,7 +557,7 @@ export class AdvancedParser extends FlexibleParser {
         name: match[2].trim(),
         description: match[3].trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -569,7 +569,7 @@ export class AdvancedParser extends FlexibleParser {
         entityType: 'störung',
         description: match[2].trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -581,7 +581,7 @@ export class AdvancedParser extends FlexibleParser {
         entityType: 'freigabe',
         description: match[2].trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -601,7 +601,7 @@ export class AdvancedParser extends FlexibleParser {
         subtype: 'von',
         targetStep: parseInt(stepNumber),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -614,7 +614,7 @@ export class AdvancedParser extends FlexibleParser {
         subtype: 'nach',
         targetStep: parseInt(stepNumber),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -635,7 +635,7 @@ export class AdvancedParser extends FlexibleParser {
         operator: match[2].trim(),
         rightOperand: match[3].trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -649,7 +649,7 @@ export class AdvancedParser extends FlexibleParser {
         operator: match[2].trim(),
         value: match[3].trim(),
         lineNumber,
-        originalText: text
+        originalText: text,
       };
     }
 
@@ -663,7 +663,7 @@ export class AdvancedParser extends FlexibleParser {
     const hierarchy = {
       mainPrograms: [],
       subPrograms: [],
-      relationships: []
+      relationships: [],
     };
 
     // Use Set for O(1) lookups instead of includes()
@@ -692,7 +692,7 @@ export class AdvancedParser extends FlexibleParser {
         targetProgram: ref.fbNumber,
         targetSteps: ref.steps,
         description: ref.description,
-        type: 'step_reference'
+        type: 'step_reference',
       };
       hierarchy.relationships.push(relationship);
     });
@@ -725,7 +725,7 @@ export class AdvancedParser extends FlexibleParser {
           content: step.description,
           stepNumber: step.number,
           lineNumber: step.lineNumber,
-          originalText: `${step.type} ${step.number}: ${step.description}`
+          originalText: `${step.type} ${step.number}: ${step.description}`,
         });
       }
     });
@@ -738,7 +738,7 @@ export class AdvancedParser extends FlexibleParser {
         group: 'tia_standard',
         description: tiaVar.description,
         isStandard: true,
-        lineNumber: 0 // System-generated
+        lineNumber: 0, // System-generated
       });
     });
     
@@ -751,7 +751,7 @@ export class AdvancedParser extends FlexibleParser {
    */
   validateStepSequence(enhanced) {
     const stepNumbers = enhanced.steps.map(s => s.number).sort((a, b) => a - b);
-    const expectedSequence = Array.from({length: stepNumbers.length}, (_, i) => i);
+    const expectedSequence = Array.from({ length: stepNumbers.length }, (_, i) => i);
     
     // Use Set for O(1) lookups instead of includes()
     const stepNumberSet = new Set(stepNumbers);
@@ -782,7 +782,7 @@ export class AdvancedParser extends FlexibleParser {
       expected: expectedSequence,
       actual: stepNumbers,
       gaps,
-      duplicates
+      duplicates,
     };
   }
 
@@ -800,7 +800,7 @@ export class AdvancedParser extends FlexibleParser {
         comments: 0,
         orBlocks: 0,
         entities: 0,
-        normalizedReferences: 0
+        normalizedReferences: 0,
       },
       categories: [
         'fb_program',
@@ -811,8 +811,8 @@ export class AdvancedParser extends FlexibleParser {
         'or_block',
         'standardized_reference',
         'entity',
-        'compound_condition'
-      ]
+        'compound_condition',
+      ],
     };
   }
 }

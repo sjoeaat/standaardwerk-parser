@@ -8,7 +8,7 @@
 import * as mammoth from 'mammoth';
 import { buildFolderTree } from './hierarchyBuilder';
 import { UnifiedTextParser } from './UnifiedTextParser.js';
-import { DEFAULT_VALIDATION_RULES, validateVariableDefinition, validateStepDefinition } from '../config/validationRules.js';
+import { DEFAULT_VALIDATION_RULES, validateVariableDefinition, validateStepDefinition } from './config/validationRules.js';
 
 // Regex patterns
 const PROGRAM_TITLE_REGEX = /^(.*?)\s+(FB|FC)(\d+)/i;
@@ -131,13 +131,13 @@ export async function parseWordDocument(file, syntaxRules, existingProgramRegist
       const fullParseResult = parser.parse(currentProgram.rawContent, 'word', {
         programName: currentProgram.name,
         functionBlock: currentProgram.type + currentProgram.fbNumber,
-        filePath: currentProgram.path
+        filePath: currentProgram.path,
       });
       
       console.log(`📊 Parse result for ${currentProgram.name}:`, {
         steps: fullParseResult.steps.length,
         variables: fullParseResult.variables.length,
-        timers: fullParseResult.timers.length
+        timers: fullParseResult.timers.length,
       });
       
       // Get processed content from parser normalization
@@ -173,7 +173,7 @@ export async function parseWordDocument(file, syntaxRules, existingProgramRegist
         
         // Folder info
         folderPath: currentProgram.path,
-        fullTitle: currentProgram.fullTitle
+        fullTitle: currentProgram.fullTitle,
       };
 
       // Log stappen voor debug
@@ -195,7 +195,7 @@ export async function parseWordDocument(file, syntaxRules, existingProgramRegist
       if (currentProgram.errors.length > 0) {
         result.errors.push(...currentProgram.errors.map(e => ({
           program: currentProgram.name,
-          ...e
+          ...e,
         })));
       }
 
@@ -218,24 +218,24 @@ export async function parseWordDocument(file, syntaxRules, existingProgramRegist
 
   try {
     if (!window.mammoth) {
-      throw new Error("Mammoth.js niet beschikbaar");
+      throw new Error('Mammoth.js niet beschikbaar');
     }
 
     const options = {
       styleMap: [
-        "p[style-name='Heading 1'] => h1:fresh",
-        "p[style-name='Heading 2'] => h2:fresh",
-        "p[style-name='Heading 3'] => h3:fresh",
-        "p[style-name='Heading 4'] => h4:fresh",
-        "p[style-name='Heading 5'] => h5:fresh",
-        "p[style-name='Heading 6'] => h6:fresh",
-      ]
+        'p[style-name=\'Heading 1\'] => h1:fresh',
+        'p[style-name=\'Heading 2\'] => h2:fresh',
+        'p[style-name=\'Heading 3\'] => h3:fresh',
+        'p[style-name=\'Heading 4\'] => h4:fresh',
+        'p[style-name=\'Heading 5\'] => h5:fresh',
+        'p[style-name=\'Heading 6\'] => h6:fresh',
+      ],
     };
 
     console.log('📄 Converting Word document to HTML...');
     const { value: html } = await window.mammoth.convertToHtml(
       { arrayBuffer: await file.arrayBuffer() },
-      options
+      options,
     );
 
     // Parse HTML structuur
@@ -244,7 +244,7 @@ export async function parseWordDocument(file, syntaxRules, existingProgramRegist
     while ((m = TAG_REGEX.exec(html)) !== null) {
       structured.push({
         type: m[1],
-        content: stripNestedTags(m[2]).trim()
+        content: stripNestedTags(m[2]).trim(),
       });
     }
 
@@ -289,7 +289,7 @@ export async function parseWordDocument(file, syntaxRules, existingProgramRegist
           type: type.toUpperCase(),
           fbNumber: num,
           idbName: null,
-          rawContent: ''
+          rawContent: '',
         };
         
         console.log(`📁 Created program with path: [${currentProgram.path.join(' → ')}] for "${currentProgram.name}"`);
@@ -362,7 +362,7 @@ export async function parseWordDocument(file, syntaxRules, existingProgramRegist
     console.log('✅ Word parsing complete:', result.statistics);
 
   } catch (err) {
-    console.error("❌ Parser fout:", err);
+    console.error('❌ Parser fout:', err);
     result.errors.push(`Lezen Word-document mislukt: ${err.message}`);
   }
 
@@ -388,7 +388,7 @@ export function enrichProgramForExport(program, syntaxRules) {
       name: program.name,
       type: program.type,
       fbNumber: program.fbNumber,
-      idbName: program.idbName
+      idbName: program.idbName,
     };
   } catch (e) {
     console.error(`Error parsing program ${program.name}:`, e);

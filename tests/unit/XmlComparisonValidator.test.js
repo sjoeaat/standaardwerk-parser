@@ -105,15 +105,15 @@ describe('XmlComparisonValidator', () => {
       const parseResult = {
         steps: [
           { type: 'SCHRITT', number: 1 },
-          { type: 'SCHRITT', number: 2 }
-        ]
+          { type: 'SCHRITT', number: 2 },
+        ],
       };
       
       const xmlData = {
         steps: [
           { number: 1 },
-          { number: 2 }
-        ]
+          { number: 2 },
+        ],
       };
       
       const validationResult = {
@@ -121,7 +121,7 @@ describe('XmlComparisonValidator', () => {
         errors: [],
         warnings: [],
         statistics: { passedTests: 0, failedTests: 0 },
-        details: {}
+        details: {},
       };
       
       validator.validateSteps(parseResult, xmlData, validationResult);
@@ -134,15 +134,15 @@ describe('XmlComparisonValidator', () => {
     test('should fail when step counts mismatch', () => {
       const parseResult = {
         steps: [
-          { type: 'SCHRITT', number: 1 }
-        ]
+          { type: 'SCHRITT', number: 1 },
+        ],
       };
       
       const xmlData = {
         steps: [
           { number: 1 },
-          { number: 2 }
-        ]
+          { number: 2 },
+        ],
       };
       
       const validationResult = {
@@ -150,7 +150,7 @@ describe('XmlComparisonValidator', () => {
         errors: [],
         warnings: [],
         statistics: { passedTests: 0, failedTests: 0 },
-        details: {}
+        details: {},
       };
       
       validator.validateSteps(parseResult, xmlData, validationResult);
@@ -164,15 +164,15 @@ describe('XmlComparisonValidator', () => {
       const parseResult = {
         steps: [
           { type: 'SCHRITT', number: 1 },
-          { type: 'SCHRITT', number: 3 }
-        ]
+          { type: 'SCHRITT', number: 3 },
+        ],
       };
       
       const xmlData = {
         steps: [
           { number: 1 },
-          { number: 2 }
-        ]
+          { number: 2 },
+        ],
       };
       
       const validationResult = {
@@ -180,7 +180,7 @@ describe('XmlComparisonValidator', () => {
         errors: [],
         warnings: [],
         statistics: { passedTests: 0, failedTests: 0 },
-        details: {}
+        details: {},
       };
       
       validator.validateSteps(parseResult, xmlData, validationResult);
@@ -197,15 +197,15 @@ describe('XmlComparisonValidator', () => {
         variables: [
           { name: 'Stap' },
           { name: 'Hulp' },
-          { name: 'Tijd' }
-        ]
+          { name: 'Tijd' },
+        ],
       };
       
       const xmlData = {
         variables: [
           { name: 'Stap', datatype: 'Int' },
-          { name: 'Hulp', datatype: 'Bool' }
-        ]
+          { name: 'Hulp', datatype: 'Bool' },
+        ],
       };
       
       const validationResult = {
@@ -213,7 +213,7 @@ describe('XmlComparisonValidator', () => {
         errors: [],
         warnings: [],
         statistics: { passedTests: 0, failedTests: 0 },
-        details: {}
+        details: {},
       };
       
       validator.validateVariables(parseResult, xmlData, validationResult);
@@ -224,14 +224,14 @@ describe('XmlComparisonValidator', () => {
     
     test('should fail when common variables are missing', () => {
       const parseResult = {
-        variables: []
+        variables: [],
       };
       
       const xmlData = {
         variables: [
           { name: 'Stap', datatype: 'Int' },
-          { name: 'Hulp', datatype: 'Bool' }
-        ]
+          { name: 'Hulp', datatype: 'Bool' },
+        ],
       };
       
       const validationResult = {
@@ -239,7 +239,7 @@ describe('XmlComparisonValidator', () => {
         errors: [],
         warnings: [],
         statistics: { passedTests: 0, failedTests: 0 },
-        details: {}
+        details: {},
       };
       
       validator.validateVariables(parseResult, xmlData, validationResult);
@@ -253,14 +253,14 @@ describe('XmlComparisonValidator', () => {
     test('should pass when cross-references are found', () => {
       const parseResult = {
         crossReferences: [
-          { program: 'FB102', rawText: 'Reference to FB102 SCHRITT 5' }
-        ]
+          { program: 'FB102', rawText: 'Reference to FB102 SCHRITT 5' },
+        ],
       };
       
       const xmlData = {
         crossReferences: [
-          { fb: 'FB102', step: '5' }
-        ]
+          { fb: 'FB102', step: '5' },
+        ],
       };
       
       const validationResult = {
@@ -268,7 +268,7 @@ describe('XmlComparisonValidator', () => {
         errors: [],
         warnings: [],
         statistics: { passedTests: 0, failedTests: 0 },
-        details: {}
+        details: {},
       };
       
       validator.validateCrossReferences(parseResult, xmlData, validationResult);
@@ -278,13 +278,13 @@ describe('XmlComparisonValidator', () => {
     
     test('should fail when cross-references are missing', () => {
       const parseResult = {
-        crossReferences: []
+        crossReferences: [],
       };
       
       const xmlData = {
         crossReferences: [
-          { fb: 'FB102', step: '5' }
-        ]
+          { fb: 'FB102', step: '5' },
+        ],
       };
       
       const validationResult = {
@@ -292,7 +292,7 @@ describe('XmlComparisonValidator', () => {
         errors: [],
         warnings: [],
         statistics: { passedTests: 0, failedTests: 0 },
-        details: {}
+        details: {},
       };
       
       validator.validateCrossReferences(parseResult, xmlData, validationResult);
@@ -305,13 +305,13 @@ describe('XmlComparisonValidator', () => {
   describe('validateComments', () => {
     test('should warn when comments are missing', () => {
       const parseResult = {
-        comments: []
+        comments: [],
       };
       
       const xmlData = {
         comments: [
-          { stepNumber: 1, comment: 'This is a test comment for step 1' }
-        ]
+          { stepNumber: 1, comment: 'This is a test comment for step 1' },
+        ],
       };
       
       const validationResult = {
@@ -319,7 +319,7 @@ describe('XmlComparisonValidator', () => {
         errors: [],
         warnings: [],
         statistics: { passedTests: 0, failedTests: 0 },
-        details: {}
+        details: {},
       };
       
       validator.validateComments(parseResult, xmlData, validationResult);
@@ -332,14 +332,14 @@ describe('XmlComparisonValidator', () => {
     test('should pass when comments are preserved', () => {
       const parseResult = {
         comments: [
-          { content: 'This is a test comment for step 1 with more text' }
-        ]
+          { content: 'This is a test comment for step 1 with more text' },
+        ],
       };
       
       const xmlData = {
         comments: [
-          { stepNumber: 1, comment: 'This is a test comment for step 1' }
-        ]
+          { stepNumber: 1, comment: 'This is a test comment for step 1' },
+        ],
       };
       
       const validationResult = {
@@ -347,7 +347,7 @@ describe('XmlComparisonValidator', () => {
         errors: [],
         warnings: [],
         statistics: { passedTests: 0, failedTests: 0 },
-        details: {}
+        details: {},
       };
       
       validator.validateComments(parseResult, xmlData, validationResult);
@@ -360,13 +360,13 @@ describe('XmlComparisonValidator', () => {
     test('should run all validations and return complete result', () => {
       const parseResult = {
         steps: [
-          { type: 'SCHRITT', number: 1 }
+          { type: 'SCHRITT', number: 1 },
         ],
         variables: [
-          { name: 'Stap' }
+          { name: 'Stap' },
         ],
         crossReferences: [],
-        comments: []
+        comments: [],
       };
       
       const xmlContent = `
@@ -390,7 +390,7 @@ describe('XmlComparisonValidator', () => {
         steps: [], // No steps parsed
         variables: [],
         crossReferences: [],
-        comments: []
+        comments: [],
       };
       
       const xmlContent = `
@@ -414,12 +414,12 @@ describe('XmlComparisonValidator', () => {
         statistics: {
           totalTests: 4,
           passedTests: 4,
-          failedTests: 0
+          failedTests: 0,
         },
         details: {
           'Step Validation': { passed: true, issues: [] },
-          'Variable Validation': { passed: true, issues: [] }
-        }
+          'Variable Validation': { passed: true, issues: [] },
+        },
       };
       
       const report = validator.generateReport(validationResult);
@@ -433,20 +433,20 @@ describe('XmlComparisonValidator', () => {
       const validationResult = {
         passed: false,
         errors: [
-          { message: 'Step count mismatch' }
+          { message: 'Step count mismatch' },
         ],
         warnings: [],
         statistics: {
           totalTests: 4,
           passedTests: 3,
-          failedTests: 1
+          failedTests: 1,
         },
         details: {
           'Step Validation': { 
             passed: false, 
-            issues: [{ message: 'Step count mismatch' }] 
-          }
-        }
+            issues: [{ message: 'Step count mismatch' }], 
+          },
+        },
       };
       
       const report = validator.generateReport(validationResult);
@@ -462,7 +462,7 @@ describe('XmlComparisonValidator', () => {
     test('should create test cases from XML samples', () => {
       const xmlSamples = [
         '<Network Title="SCHRITT 1"/>',
-        '<Network Title="SCHRITT 2"/><Member Name="Test" Datatype="Bool"/>'
+        '<Network Title="SCHRITT 2"/><Member Name="Test" Datatype="Bool"/>',
       ];
       
       const testCases = validator.createTestCases(xmlSamples);
@@ -476,7 +476,7 @@ describe('XmlComparisonValidator', () => {
     
     test('should validate function work correctly in test cases', () => {
       const xmlSamples = [
-        '<Network Title="SCHRITT 1"/>'
+        '<Network Title="SCHRITT 1"/>',
       ];
       
       const testCases = validator.createTestCases(xmlSamples);
@@ -484,7 +484,7 @@ describe('XmlComparisonValidator', () => {
         steps: [{ type: 'SCHRITT', number: 1 }],
         variables: [],
         crossReferences: [],
-        comments: []
+        comments: [],
       };
       
       const validationResult = testCases[0].validate(parseResult);

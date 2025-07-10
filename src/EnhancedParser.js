@@ -5,7 +5,7 @@
 // Maintains flexibility for future training and optimization
 // =====================================================================
 
-import { determineVariableGroup } from '../config/validationRules.js';
+import { determineVariableGroup } from './config/validationRules.js';
 
 /**
  * Enhanced Parser with rule-based logic and training capabilities
@@ -26,10 +26,10 @@ export class EnhancedParser {
         timer: /(?:TIJD|ZEIT|TIME)\s+(\d+)\s*(Sek|sek|Min|min|s|m)\s*\?\?/i,
         crossReference: /^(.+?)\s*\(([^)]+)\s+(SCHRITT|STAP|STEP)\s+([0-9+]+)\)\s*$/i,
         assignment: /^([^=]+)\s*=\s*(.*)$/,
-        comparison: /^([^<>=!]+)\s*([<>=!]+)\s*(.*)$/
+        comparison: /^([^<>=!]+)\s*([<>=!]+)\s*(.*)$/,
       },
       variable: /^([A-Za-z][A-Za-z0-9_\s]*)\s*=\s*(.*)$/,
-      program: /^([A-Za-z][A-Za-z0-9_\s]*)\s+(FB\d+)$/i
+      program: /^([A-Za-z][A-Za-z0-9_\s]*)\s+(FB\d+)$/i,
     };
     
     // Training data storage
@@ -38,7 +38,7 @@ export class EnhancedParser {
       conditions: [],
       variables: [],
       crossReferences: [],
-      patterns: new Map()
+      patterns: new Map(),
     };
     
     // Performance metrics
@@ -49,7 +49,7 @@ export class EnhancedParser {
       crossReferences: 0,
       timers: 0,
       parseErrors: 0,
-      patternMatches: new Map()
+      patternMatches: new Map(),
     };
   }
 
@@ -68,8 +68,8 @@ export class EnhancedParser {
       metadata: {
         totalLines: lines.length,
         parseTime: Date.now(),
-        parser: 'EnhancedParser'
-      }
+        parser: 'EnhancedParser',
+      },
     };
 
     let currentStep = null;
@@ -133,14 +133,14 @@ export class EnhancedParser {
         this.addToTrainingData('unknown', {
           text: trimmed,
           lineNumber: index + 1,
-          context: currentStep ? 'within_step' : 'global'
+          context: currentStep ? 'within_step' : 'global',
         });
 
       } catch (error) {
         result.errors.push({
           line: index + 1,
           message: error.message,
-          text: trimmed
+          text: trimmed,
         });
         this.metrics.parseErrors++;
       }
@@ -179,8 +179,8 @@ export class EnhancedParser {
       conditions: [],
       metadata: {
         originalText: text,
-        parser: 'EnhancedParser'
-      }
+        parser: 'EnhancedParser',
+      },
     };
 
     // Add to training data
@@ -227,7 +227,7 @@ export class EnhancedParser {
         description: crossRefMatch[1].trim(),
         program: crossRefMatch[2].trim(),
         steps: crossRefMatch[4].split('+').map(s => parseInt(s.trim())),
-        rawText: conditionText
+        rawText: conditionText,
       };
     }
 
@@ -238,7 +238,7 @@ export class EnhancedParser {
       timer = {
         value: parseInt(timerMatch[1]),
         unit: timerMatch[2].toLowerCase(),
-        rawText: conditionText
+        rawText: conditionText,
       };
     }
 
@@ -249,7 +249,7 @@ export class EnhancedParser {
       assignment = {
         variable: assignmentMatch[1].trim(),
         value: assignmentMatch[2].trim(),
-        rawText: conditionText
+        rawText: conditionText,
       };
     }
 
@@ -271,9 +271,9 @@ export class EnhancedParser {
           negation: isNegated,
           timer: hasTimer,
           assignment: hasAssignment,
-          crossReference: hasCrossRef
-        }
-      }
+          crossReference: hasCrossRef,
+        },
+      },
     };
 
     // Add to training data
@@ -308,8 +308,8 @@ export class EnhancedParser {
       lineNumber,
       metadata: {
         originalText: text,
-        parser: 'EnhancedParser'
-      }
+        parser: 'EnhancedParser',
+      },
     };
 
     // Add to training data
@@ -330,7 +330,7 @@ export class EnhancedParser {
     this.trainingData[type].push({
       ...data,
       timestamp: Date.now(),
-      confidence: this.calculateConfidence(type, data)
+      confidence: this.calculateConfidence(type, data),
     });
   }
 
@@ -339,18 +339,18 @@ export class EnhancedParser {
    */
   calculateConfidence(type, data) {
     switch (type) {
-      case 'step':
-        return data.number ? 0.95 : 0.85; // Numbered steps more confident
-      case 'condition':
-        let confidence = 0.7;
-        if (data.crossReference) confidence += 0.15;
-        if (data.timer) confidence += 0.1;
-        if (data.assignment) confidence += 0.1;
-        return Math.min(confidence, 1.0);
-      case 'variable':
-        return data.group !== 'hulpmerker' ? 0.8 : 0.6; // Non-default groups more confident
-      default:
-        return 0.5;
+    case 'step':
+      return data.number ? 0.95 : 0.85; // Numbered steps more confident
+    case 'condition':
+      let confidence = 0.7;
+      if (data.crossReference) confidence += 0.15;
+      if (data.timer) confidence += 0.1;
+      if (data.assignment) confidence += 0.1;
+      return Math.min(confidence, 1.0);
+    case 'variable':
+      return data.group !== 'hulpmerker' ? 0.8 : 0.6; // Non-default groups more confident
+    default:
+      return 0.5;
     }
   }
 
@@ -362,7 +362,7 @@ export class EnhancedParser {
       this.metrics.patternMatches.set(patternName, 0);
     }
     this.metrics.patternMatches.set(patternName, 
-      this.metrics.patternMatches.get(patternName) + 1
+      this.metrics.patternMatches.get(patternName) + 1,
     );
   }
 
@@ -477,7 +477,7 @@ export class EnhancedParser {
       parser: 'EnhancedParser',
       trainingData: this.trainingData,
       metrics: this.metrics,
-      patterns: this.serializePatterns()
+      patterns: this.serializePatterns(),
     };
   }
 
@@ -516,7 +516,7 @@ export class EnhancedParser {
       crossReferences: 0,
       timers: 0,
       parseErrors: 0,
-      patternMatches: new Map()
+      patternMatches: new Map(),
     };
   }
 
@@ -527,7 +527,7 @@ export class EnhancedParser {
     return {
       ...this.metrics,
       patternMatches: Object.fromEntries(this.metrics.patternMatches),
-      parsingEfficiency: this.calculateParsingEfficiency()
+      parsingEfficiency: this.calculateParsingEfficiency(),
     };
   }
 

@@ -31,7 +31,7 @@ export class HierarchicalParser {
     const result = this.parseHierarchically(hierarchicalTree);
     this.log('✅ Hierarchical parsing complete', { 
       steps: result.steps.length, 
-      variables: result.variables.length 
+      variables: result.variables.length, 
     });
     
     return result;
@@ -59,14 +59,14 @@ export class HierarchicalParser {
         indentLevel,
         contentType,
         lineNumber: i + 1,
-        children: []
+        children: [],
       };
       
       structuredLines.push(structuredLine);
       this.log(`📝 Line ${i+1}`, { 
         content: trimmed.substring(0, 50), 
         indentLevel, 
-        contentType 
+        contentType, 
       });
     }
     
@@ -184,23 +184,23 @@ export class HierarchicalParser {
    */
   processNode(node, result) {
     switch (node.contentType) {
-      case 'rust':
-        this.processRustStep(node, result);
-        break;
-      case 'schritt':
-        this.processSchrittStep(node, result);
-        break;
-      case 'variable':
-        this.processVariable(node, result);
-        break;
-      case 'cross_reference':
-        this.processCrossReference(node, result);
-        break;
-      case 'von_schritt':
-        this.processVonSchritt(node, result);
-        break;
-      default:
-        this.log(`⚠️ Unhandled node type: ${node.contentType}`);
+    case 'rust':
+      this.processRustStep(node, result);
+      break;
+    case 'schritt':
+      this.processSchrittStep(node, result);
+      break;
+    case 'variable':
+      this.processVariable(node, result);
+      break;
+    case 'cross_reference':
+      this.processCrossReference(node, result);
+      break;
+    case 'von_schritt':
+      this.processVonSchritt(node, result);
+      break;
+    default:
+      this.log(`⚠️ Unhandled node type: ${node.contentType}`);
     }
   }
 
@@ -215,7 +215,7 @@ export class HierarchicalParser {
       entryConditions: [], // RUST NEVER has entry conditions!
       exitConditions: [],
       implicitConditions: [], // Will be populated later
-      lineNumber: node.lineNumber
+      lineNumber: node.lineNumber,
     };
     
     this.log('🛑 Created RUST step', { description: rustStep.description });
@@ -234,13 +234,13 @@ export class HierarchicalParser {
       entryConditions: this.extractConditionsFromChildren(node.children),
       exitConditions: [],
       transitions: [],
-      lineNumber: node.lineNumber
+      lineNumber: node.lineNumber,
     };
     
     this.log('⚡ Created SCHRITT step', { 
       number: stepNumber, 
       description: schrittStep.description,
-      conditionGroups: schrittStep.entryConditions.length
+      conditionGroups: schrittStep.entryConditions.length,
     });
     
     result.steps.push(schrittStep);
@@ -293,7 +293,7 @@ export class HierarchicalParser {
       isNot: isNegated,
       operator: isOr ? 'OR' : 'AND',
       lineNumber: conditionNode.lineNumber,
-      indentLevel: conditionNode.indentLevel
+      indentLevel: conditionNode.indentLevel,
     };
   }
 
@@ -317,11 +317,11 @@ export class HierarchicalParser {
         type: 'implicit',
         text: `NICHT SCHRITT ${s.number}`,
         negated: true,
-        stepReference: s.number
+        stepReference: s.number,
       }));
       
       this.log('🔄 Applied RUST implicit logic', { 
-        implicitConditions: rustStep.implicitConditions.length 
+        implicitConditions: rustStep.implicitConditions.length, 
       });
     }
   }
@@ -352,7 +352,7 @@ export class HierarchicalParser {
       errors: [],
       warnings: [],
       crossReferences: [],
-      metadata: {}
+      metadata: {},
     };
   }
 

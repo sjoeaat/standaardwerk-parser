@@ -6,7 +6,7 @@
 // =====================================================================
 
 import { EnhancedLogicParser } from './EnhancedLogicParser.js';
-import { DEFAULT_VALIDATION_RULES, validateVariableDefinition, validateStepDefinition, validateCrossReference } from '../config/validationRules.js';
+import { DEFAULT_VALIDATION_RULES, validateVariableDefinition, validateStepDefinition, validateCrossReference } from './config/validationRules.js';
 
 /**
  * Unified parser that handles both Word document import and manual text input
@@ -43,7 +43,7 @@ export class UnifiedTextParser {
       timestamp: new Date().toISOString(),
       version: '1.0.0',
       normalizedLineCount: normalizedText.split('\\n').length,
-      originalLineCount: text.split('\\n').length
+      originalLineCount: text.split('\\n').length,
     };
     
     return validated;
@@ -54,7 +54,7 @@ export class UnifiedTextParser {
    */
   normalizeText(text, source) {
     console.log(`🔧 Starting normalization for source: ${source}`);
-    console.log(`📝 Original text (first 300 chars):`, text.substring(0, 300));
+    console.log('📝 Original text (first 300 chars):', text.substring(0, 300));
     
     let normalized = text;
     
@@ -73,7 +73,7 @@ export class UnifiedTextParser {
     // Final consistency checks
     normalized = this.applyConsistencyRules(normalized);
     
-    console.log(`✅ Normalized text (first 300 chars):`, normalized.substring(0, 300));
+    console.log('✅ Normalized text (first 300 chars):', normalized.substring(0, 300));
     
     return normalized;
   }
@@ -107,7 +107,7 @@ export class UnifiedTextParser {
     // Fix common encoding issues from Word documents
     return text
       .replace(/[""]/g, '"')
-      .replace(/['']/g, "'")
+      .replace(/['']/g, '\'')
       .replace(/–/g, '-')
       .replace(/—/g, '-')
       .replace(/…/g, '...')
@@ -351,7 +351,7 @@ export class UnifiedTextParser {
             crossReferences.push({
               ...condition.crossReference,
               lineNumber: condition.lineNumber,
-              step: step.number
+              step: step.number,
             });
           }
         });
@@ -386,7 +386,7 @@ export class UnifiedTextParser {
           result.errors.push({
             type: 'DUPLICATE_STEP',
             message: `Duplicate step number: ${step.number}`,
-            lineNumber: step.lineNumber
+            lineNumber: step.lineNumber,
           });
         }
         stepNumbers.set(step.number, step);
@@ -403,7 +403,7 @@ export class UnifiedTextParser {
         result.warnings.push({
           type: 'MISSING_SEQUENTIAL_STEP',
           message: `Gap in sequential steps: ${previous.number} -> ${current.number}`,
-          lineNumber: current.lineNumber
+          lineNumber: current.lineNumber,
         });
       }
     }
@@ -416,7 +416,7 @@ export class UnifiedTextParser {
           result.errors.push({
             type: 'INVALID_VON_SCHRITT',
             message: `VON SCHRITT ${transition.fromStep} references non-existent step`,
-            lineNumber: step.lineNumber
+            lineNumber: step.lineNumber,
           });
         }
       });
@@ -452,8 +452,8 @@ export class UnifiedTextParser {
       validationRules: this.validationRules,
       programRegistry: Array.from(this.programRegistry.entries()).map(([name, data]) => ({
         name,
-        steps: data.steps.map(s => ({ number: s.number, type: s.type, description: s.description }))
-      }))
+        steps: data.steps.map(s => ({ number: s.number, type: s.type, description: s.description })),
+      })),
     };
   }
 
@@ -487,7 +487,7 @@ export class UnifiedTextParser {
       
       stepTypeDistribution: {
         RUST: results.reduce((sum, r) => sum + r.steps.filter(s => s.type === 'RUST').length, 0),
-        SCHRITT: results.reduce((sum, r) => sum + r.steps.filter(s => s.type === 'SCHRITT').length, 0)
+        SCHRITT: results.reduce((sum, r) => sum + r.steps.filter(s => s.type === 'SCHRITT').length, 0),
       },
       
       variableTypeDistribution: {
@@ -495,11 +495,11 @@ export class UnifiedTextParser {
         storing: results.reduce((sum, r) => sum + r.variables.filter(v => v.type === 'storing').length, 0),
         melding: results.reduce((sum, r) => sum + r.variables.filter(v => v.type === 'melding').length, 0),
         tijd: results.reduce((sum, r) => sum + r.variables.filter(v => v.type === 'tijd').length, 0),
-        teller: results.reduce((sum, r) => sum + r.variables.filter(v => v.type === 'teller').length, 0)
+        teller: results.reduce((sum, r) => sum + r.variables.filter(v => v.type === 'teller').length, 0),
       },
       
       errorTypeDistribution: {},
-      warningTypeDistribution: {}
+      warningTypeDistribution: {},
     };
     
     // Calculate error/warning type distributions

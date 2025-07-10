@@ -104,7 +104,7 @@ export class RegexCache {
       // Entity patterns
       { pattern: '^(Käsezähler|Cheese Counter)\\s+([A-Za-z0-9_\\s]+)\\s*(.*)$', flags: 'i' },
       { pattern: '^(NICHT\\s+)?(Störung|Fault|Error)\\s*[:.]?\\s*(.+)$', flags: 'i' },
-      { pattern: '^(Freigabe|Release|Enable)\\s+(.+)$', flags: 'i' }
+      { pattern: '^(Freigabe|Release|Enable)\\s+(.+)$', flags: 'i' },
     ];
 
     console.log('🚀 Pre-compiling', commonPatterns.length, 'regex patterns...');
@@ -130,7 +130,7 @@ export class RegexCache {
       missCount: this.missCount,
       hitRate: totalRequests > 0 ? (this.hitCount / totalRequests * 100).toFixed(2) + '%' : '0%',
       compilationTime: this.compilationTime.toFixed(2) + 'ms',
-      memoryEstimate: (this.cache.size * 0.5).toFixed(1) + 'KB' // Rough estimate
+      memoryEstimate: (this.cache.size * 0.5).toFixed(1) + 'KB', // Rough estimate
     };
   }
 

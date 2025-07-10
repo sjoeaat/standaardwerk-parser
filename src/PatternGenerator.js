@@ -20,7 +20,7 @@ export class PatternGenerator {
       minRecall: options.minRecall || 0.7,
       maxPatterns: options.maxPatterns || 5,
       ngramSize: options.ngramSize || 3,
-      ...options
+      ...options,
     };
     
     this.trainingData = new Map(); // groupType -> [{text, type, ...}]
@@ -52,7 +52,7 @@ export class PatternGenerator {
               text: example,
               type: suggestion.potentialType,
               confidence: suggestion.confidence,
-              frequency: suggestion.frequency
+              frequency: suggestion.frequency,
             });
           });
         });
@@ -144,7 +144,7 @@ export class PatternGenerator {
           description: `Starts with "${word}"`,
           type: 'frequency_start',
           sourceWord: word,
-          frequency: freq
+          frequency: freq,
         });
         
         // Word anywhere
@@ -153,7 +153,7 @@ export class PatternGenerator {
           description: `Contains "${word}"`,
           type: 'frequency_contains',
           sourceWord: word,
-          frequency: freq
+          frequency: freq,
         });
       }
     });
@@ -192,7 +192,7 @@ export class PatternGenerator {
           description: `Contains n-gram "${ngram}"`,
           type: 'ngram',
           sourceNgram: ngram,
-          frequency: freq
+          frequency: freq,
         });
       }
     });
@@ -213,7 +213,7 @@ export class PatternGenerator {
       'number_prefix': /^\\d+/,
       'parentheses': /\\([^)]+\\)/,
       'german_compound': /[a-zA-Z]+[a-zA-Z]+/,
-      'mixed_case': /[a-z][A-Z]/
+      'mixed_case': /[a-z][A-Z]/,
     };
     
     Object.entries(structures).forEach(([structType, regex]) => {
@@ -225,7 +225,7 @@ export class PatternGenerator {
           description: `${structType} structure`,
           type: 'structure',
           structureType: structType,
-          frequency: matchingExamples.length
+          frequency: matchingExamples.length,
         });
       }
     });
@@ -245,7 +245,7 @@ export class PatternGenerator {
     
     // Pattern for technical codes like "2MP62 Störung"
     const techCodeMatches = examples.filter(ex => 
-      /^[A-Z0-9]{2,}\\s+\\w+/.test(ex.text)
+      /^[A-Z0-9]{2,}\\s+\\w+/.test(ex.text),
     );
     
     if (techCodeMatches.length >= this.options.minFrequency) {
@@ -254,13 +254,13 @@ export class PatternGenerator {
         description: 'Technical code format (CODE WORD)',
         type: 'format',
         formatType: 'technical_code',
-        frequency: techCodeMatches.length
+        frequency: techCodeMatches.length,
       });
     }
     
     // Pattern for "Freigabe von X" structure
     const freigabeMatches = examples.filter(ex => 
-      /freigabe\\s+\\w+/i.test(ex.text)
+      /freigabe\\s+\\w+/i.test(ex.text),
     );
     
     if (freigabeMatches.length >= this.options.minFrequency) {
@@ -269,7 +269,7 @@ export class PatternGenerator {
         description: 'Freigabe structure',
         type: 'format',
         formatType: 'freigabe',
-        frequency: freigabeMatches.length
+        frequency: freigabeMatches.length,
       });
     }
     
@@ -298,14 +298,14 @@ export class PatternGenerator {
         precision,
         recall,
         f1Score,
-        matches: matches.length
+        matches: matches.length,
       });
       
       this.patternStats.set(candidate.pattern, {
         precision,
         recall,
         f1Score,
-        frequency: candidate.frequency
+        frequency: candidate.frequency,
       });
     });
     
@@ -320,7 +320,7 @@ export class PatternGenerator {
       .filter(pattern => 
         pattern.precision >= this.options.minPrecision &&
         pattern.recall >= this.options.minRecall &&
-        pattern.frequency >= this.options.minFrequency
+        pattern.frequency >= this.options.minFrequency,
       )
       .sort((a, b) => b.f1Score - a.f1Score)
       .slice(0, this.options.maxPatterns);
@@ -331,12 +331,12 @@ export class PatternGenerator {
    */
   exportToValidationConfig(outputPath) {
     const validationConfig = {
-      version: "2.0.0",
+      version: '2.0.0',
       generatedAt: new Date().toISOString(),
       patternGenerationOptions: this.options,
       validationRules: {
-        groups: {}
-      }
+        groups: {},
+      },
     };
     
     // Convert generated patterns to validation config format
@@ -351,8 +351,8 @@ export class PatternGenerator {
           precision: p.precision,
           recall: p.recall,
           f1Score: p.f1Score,
-          frequency: p.frequency
-        }))
+          frequency: p.frequency,
+        })),
       };
     });
     
@@ -373,14 +373,14 @@ export class PatternGenerator {
         totalPatterns: Array.from(this.generatedPatterns.values()).reduce((sum, patterns) => sum + patterns.length, 0),
         averagePrecision: this.calculateAveragePrecision(),
         averageRecall: this.calculateAverageRecall(),
-        generatedAt: new Date().toISOString()
+        generatedAt: new Date().toISOString(),
       },
       
       groupSummary: {},
       
       patternDetails: {},
       
-      recommendations: this.generatePatternRecommendations()
+      recommendations: this.generatePatternRecommendations(),
     };
     
     // Generate group summaries
@@ -389,7 +389,7 @@ export class PatternGenerator {
         totalPatterns: patterns.length,
         averageF1Score: patterns.reduce((sum, p) => sum + p.f1Score, 0) / patterns.length,
         bestPattern: patterns[0]?.pattern || null,
-        totalExamples: this.trainingData.get(groupType)?.length || 0
+        totalExamples: this.trainingData.get(groupType)?.length || 0,
       };
       
       report.patternDetails[groupType] = patterns.map(p => ({
@@ -399,7 +399,7 @@ export class PatternGenerator {
         recall: p.recall,
         f1Score: p.f1Score,
         frequency: p.frequency,
-        type: p.type
+        type: p.type,
       }));
     });
     
@@ -442,7 +442,7 @@ export class PatternGenerator {
           type: 'low_pattern_count',
           groupType,
           message: `Only ${patterns.length} patterns generated for ${groupType}. Consider adding more training data.`,
-          priority: 'medium'
+          priority: 'medium',
         });
       }
     });
@@ -455,7 +455,7 @@ export class PatternGenerator {
           type: 'low_precision',
           groupType,
           message: `Average precision for ${groupType} is ${avgPrecision.toFixed(2)}. Consider refining patterns.`,
-          priority: 'high'
+          priority: 'high',
         });
       }
     });

@@ -156,7 +156,7 @@ RUHE: Initial state`;
     });
 
     test('should parse inline comments', () => {
-      const input = `SCHRITT 1: First step // This is an inline comment`;
+      const input = 'SCHRITT 1: First step // This is an inline comment';
 
       const result = parser.parse(input);
       

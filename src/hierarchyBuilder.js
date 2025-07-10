@@ -16,7 +16,7 @@ export function buildFolderTree(programs) {
         node.children[segment] = {
           name: segment,
           children: {},
-          programs: []
+          programs: [],
         };
       }
       node = node.children[segment];

@@ -14,7 +14,7 @@ export class MemoryMonitor {
     this.thresholds = {
       warning: 50 * 1024 * 1024,    // 50MB
       critical: 100 * 1024 * 1024,  // 100MB
-      heapGrowth: 10 * 1024 * 1024  // 10MB growth
+      heapGrowth: 10 * 1024 * 1024,  // 10MB growth
     };
     this.isMonitoring = false;
     this.monitoringInterval = null;
@@ -80,7 +80,7 @@ export class MemoryMonitor {
   getCurrentMemoryUsage() {
     const measurement = {
       timestamp: Date.now(),
-      context: null
+      context: null,
     };
 
     // Use performance.memory if available (Chrome/Edge)
@@ -102,7 +102,7 @@ export class MemoryMonitor {
         rss: nodeMemory.rss,
         heapUsed: nodeMemory.heapUsed,
         heapTotal: nodeMemory.heapTotal,
-        external: nodeMemory.external
+        external: nodeMemory.external,
       };
     }
 
@@ -140,14 +140,14 @@ export class MemoryMonitor {
         severity: 'critical',
         type: 'high_memory_usage',
         message: `Memory usage is critically high: ${this.formatBytes(memoryUsed)}`,
-        suggestion: 'Consider clearing caches, disposing unused objects, or reloading the page'
+        suggestion: 'Consider clearing caches, disposing unused objects, or reloading the page',
       });
     } else if (memoryUsed > this.thresholds.warning) {
       issues.push({
         severity: 'warning',
         type: 'elevated_memory_usage',
         message: `Memory usage is elevated: ${this.formatBytes(memoryUsed)}`,
-        suggestion: 'Monitor for memory leaks or optimize data structures'
+        suggestion: 'Monitor for memory leaks or optimize data structures',
       });
     }
 
@@ -192,7 +192,7 @@ export class MemoryMonitor {
         'No memory leak detected',
       suggestion: isPotentialLeak ?
         'Check for event listeners, timers, or objects that are not being properly cleaned up' :
-        null
+        null,
     };
   }
 
@@ -243,9 +243,9 @@ export class MemoryMonitor {
         max: this.formatBytes(max),
         average: this.formatBytes(avg),
         growth: measurements.length > 1 ? 
-          this.formatBytes(current - measurements[0].jsHeapSize) : '0B'
+          this.formatBytes(current - measurements[0].jsHeapSize) : '0B',
       },
-      health: this.getHealthStatus(current)
+      health: this.getHealthStatus(current),
     };
   }
 
@@ -328,7 +328,7 @@ export class MemoryMonitor {
       measurements: this.measurements,
       statistics: this.getStatistics(),
       thresholds: this.thresholds,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }
@@ -356,7 +356,7 @@ export async function monitorOperation(operationName, operation) {
       memoryBefore: monitor.formatBytes(before.jsHeapSize || 0),
       memoryAfter: monitor.formatBytes(after.jsHeapSize || 0),
       memoryDiff: monitor.formatBytes(Math.abs(memoryDiff)),
-      trend: memoryDiff > 0 ? 'increased' : memoryDiff < 0 ? 'decreased' : 'unchanged'
+      trend: memoryDiff > 0 ? 'increased' : memoryDiff < 0 ? 'decreased' : 'unchanged',
     });
     
     return result;

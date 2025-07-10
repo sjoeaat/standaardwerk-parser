@@ -53,7 +53,7 @@ async function testPreprocessingIssues() {
   
   // Disable preprocessing temporarily to show difference
   const originalPreprocess = parserBasic.preprocessor.preprocess;
-  parserBasic.preprocessor.preprocess = (text) => text; // Pass through
+  parserBasic.preprocessor.preprocess = text => text; // Pass through
   
   const resultBefore = parserBasic.parseText(problematicContent);
   console.log('Raw parsing results:');

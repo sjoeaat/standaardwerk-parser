@@ -81,7 +81,7 @@ describe('syntaxRules Configuration', () => {
     
     test('FB-referenced step pattern should match examples', () => {
       const fbPattern = defaultSyntaxRules.stepPatterns.find(p => 
-        p.description.includes('FB-referenced')
+        p.description.includes('FB-referenced'),
       );
       
       expect(fbPattern).toBeDefined();
@@ -92,7 +92,7 @@ describe('syntaxRules Configuration', () => {
     
     test('enhanced FB-reference pattern should match complex examples', () => {
       const enhancedPattern = defaultSyntaxRules.stepPatterns.find(p => 
-        p.description.includes('Enhanced FB-reference')
+        p.description.includes('Enhanced FB-reference'),
       );
       
       expect(enhancedPattern).toBeDefined();
@@ -105,7 +105,7 @@ describe('syntaxRules Configuration', () => {
     test('should have cross-reference pattern', () => {
       expect(defaultSyntaxRules.conditionPatterns).toBeInstanceOf(Array);
       const crossRefPattern = defaultSyntaxRules.conditionPatterns.find(p => 
-        p.type === 'cross_reference'
+        p.type === 'cross_reference',
       );
       
       expect(crossRefPattern).toBeDefined();
@@ -149,7 +149,7 @@ describe('syntaxRules Configuration', () => {
     
     test('control variable pattern should match specific keywords', () => {
       const controlPattern = defaultSyntaxRules.variablePatterns.find(p => 
-        p.description.includes('control variable')
+        p.description.includes('control variable'),
       );
       
       expect(controlPattern).toBeDefined();
@@ -161,7 +161,7 @@ describe('syntaxRules Configuration', () => {
     
     test('process control variable pattern should match', () => {
       const processPattern = defaultSyntaxRules.variablePatterns.find(p => 
-        p.description.includes('process control variable')
+        p.description.includes('process control variable'),
       );
       
       expect(processPattern).toBeDefined();
@@ -181,12 +181,12 @@ describe('syntaxRules Configuration', () => {
         { input: 'SCHRITT 99: Complex step', expected: true },
         { input: 'STEP 42: English step', expected: true },
         { input: '3.1\tA01: Process FB100\t5', expected: true },
-        { input: 'INVALID STEP', expected: false }
+        { input: 'INVALID STEP', expected: false },
       ];
       
       testCases.forEach(({ input, expected }) => {
         const matched = defaultSyntaxRules.stepPatterns.some(p => 
-          p.pattern.test(input)
+          p.pattern.test(input),
         );
         expect(matched).toBe(expected);
       });
@@ -198,12 +198,12 @@ describe('syntaxRules Configuration', () => {
         { input: 'Freigabe Tank A =', expected: true },
         { input: 'Einfuhr Process =', expected: true },
         { input: 'No equals sign', expected: false },
-        { input: '= Invalid start', expected: false }
+        { input: '= Invalid start', expected: false },
       ];
       
       testCases.forEach(({ input, expected }) => {
         const matched = defaultSyntaxRules.variablePatterns.some(p => 
-          p.pattern.test(input)
+          p.pattern.test(input),
         );
         expect(matched).toBe(expected);
       });
@@ -215,7 +215,7 @@ describe('syntaxRules Configuration', () => {
       const allPatterns = [
         ...defaultSyntaxRules.stepPatterns,
         ...defaultSyntaxRules.conditionPatterns,
-        ...defaultSyntaxRules.variablePatterns
+        ...defaultSyntaxRules.variablePatterns,
       ];
       
       allPatterns.forEach(pattern => {
@@ -227,7 +227,7 @@ describe('syntaxRules Configuration', () => {
     test('auto-learned patterns should have appropriate confidence', () => {
       const autoLearnedPatterns = [
         ...defaultSyntaxRules.stepPatterns,
-        ...defaultSyntaxRules.variablePatterns
+        ...defaultSyntaxRules.variablePatterns,
       ].filter(p => p.description.includes('Auto-learned'));
       
       expect(autoLearnedPatterns.length).toBeGreaterThan(0);

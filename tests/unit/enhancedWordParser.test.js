@@ -4,18 +4,18 @@ import { parseWordDocument, enrichProgramForExport } from '../../src/enhancedWor
 // Mock dependencies
 jest.mock('mammoth');
 jest.mock('../../src/hierarchyBuilder.js', () => ({
-  buildFolderTree: jest.fn((programs) => ({
+  buildFolderTree: jest.fn(programs => ({
     name: null,
     children: {},
-    programs: programs
-  }))
+    programs: programs,
+  })),
 }));
 jest.mock('../../src/UnifiedTextParser.js', () => ({
   UnifiedTextParser: jest.fn().mockImplementation(() => ({
-    parse: jest.fn((content) => ({
+    parse: jest.fn(content => ({
       steps: [
         { type: 'RUST', number: 0, description: 'Initial state', conditions: [] },
-        { type: 'SCHRITT', number: 1, description: 'First step', conditions: ['Condition 1'] }
+        { type: 'SCHRITT', number: 1, description: 'First step', conditions: ['Condition 1'] },
       ],
       variables: [{ name: 'Test Variable', value: '10' }],
       timers: [],
@@ -24,11 +24,11 @@ jest.mock('../../src/UnifiedTextParser.js', () => ({
       transitionConditions: [],
       statistics: { totalSteps: 2 },
       errors: [],
-      warnings: []
+      warnings: [],
     })),
-    normalizeText: jest.fn((text) => text),
-    registerProgram: jest.fn()
-  }))
+    normalizeText: jest.fn(text => text),
+    registerProgram: jest.fn(),
+  })),
 }));
 
 describe('enhancedWordParser', () => {
@@ -43,15 +43,15 @@ describe('enhancedWordParser', () => {
       stepKeywords: {
         step: ['STAP', 'SCHRITT', 'STEP'],
         rest: ['RUST', 'RUHE', 'IDLE'],
-        end: ['KLAAR', 'FERTIG', 'END']
-      }
+        end: ['KLAAR', 'FERTIG', 'END'],
+      },
     };
     
     // Setup window.mammoth mock
     global.window = {
       mammoth: {
-        convertToHtml: jest.fn()
-      }
+        convertToHtml: jest.fn(),
+      },
     };
   });
   
@@ -158,8 +158,8 @@ describe('enhancedWordParser', () => {
         parse: jest.fn(() => {
           throw new Error('Parse error');
         }),
-        normalizeText: jest.fn((text) => text),
-        registerProgram: jest.fn()
+        normalizeText: jest.fn(text => text),
+        registerProgram: jest.fn(),
       }));
       
       window.mammoth.convertToHtml.mockResolvedValue({ value: htmlContent });
@@ -183,7 +183,7 @@ describe('enhancedWordParser', () => {
       const file = new Blob(['test'], { type: 'application/msword' });
       
       const existingPrograms = new Map([
-        ['FB50', { name: 'Existing', steps: [] }]
+        ['FB50', { name: 'Existing', steps: [] }],
       ]);
       
       await parseWordDocument(file, syntaxRules, existingPrograms);
@@ -256,7 +256,7 @@ describe('enhancedWordParser', () => {
       const program = {
         name: 'Test',
         steps: [{ type: 'RUST', number: 0 }],
-        variables: []
+        variables: [],
       };
       
       const result = enrichProgramForExport(program, syntaxRules);
@@ -271,16 +271,16 @@ describe('enhancedWordParser', () => {
           parse: jest.fn(() => ({
             steps: [{ type: 'RUST', number: 0 }],
             variables: [],
-            timers: []
-          }))
-        }))
+            timers: [],
+          })),
+        })),
       }));
       
       const program = {
         name: 'Test',
         type: 'FB',
         fbNumber: 100,
-        rawContent: 'RUST: Initial'
+        rawContent: 'RUST: Initial',
       };
       
       const result = enrichProgramForExport(program, syntaxRules);
@@ -293,7 +293,7 @@ describe('enhancedWordParser', () => {
     test('should handle parse errors in enrichment', () => {
       const program = {
         name: 'Test',
-        rawContent: 'Invalid content'
+        rawContent: 'Invalid content',
       };
       
       // Force an error by not having steps
@@ -329,16 +329,16 @@ describe('enhancedWordParser', () => {
       const testCases = [
         { 
           html: '<h1>1. Tank Control System FB100</h1><p>Content</p>',
-          expectedIdb: 'TankControlSystem'
+          expectedIdb: 'TankControlSystem',
         },
         { 
           html: '<h1>2. Process: Monitor FB200</h1><p>Content</p>',
-          expectedIdb: 'Process_Monitor'
+          expectedIdb: 'Process_Monitor',
         },
         { 
           html: '<h1>3. FB300</h1><p>Content</p>',
-          expectedIdb: 'Generated_IDB'
-        }
+          expectedIdb: 'Generated_IDB',
+        },
       ];
       
       for (const testCase of testCases) {

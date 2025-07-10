@@ -10,13 +10,13 @@
 import { readFileSync, writeFileSync, existsSync, lstatSync, readdirSync, mkdirSync } from 'fs';
 import { join, dirname, basename, extname } from 'path';
 import { fileURLToPath } from 'url';
-import { UnifiedTextParser } from './src/core/UnifiedTextParser.js';
-import { FlexibleParser } from './src/core/FlexibleParser.js';
-import { AdvancedParser } from './src/core/AdvancedParser.js';
-import { defaultSyntaxRules } from './src/config/syntaxRules.js';
-import { DEFAULT_VALIDATION_RULES } from './src/config/validationRules.js';
-import { DocxParser } from './src/core/DocxParser.js';
-import { AutoTrainer } from './src/core/AutoTrainer.js';
+import { UnifiedTextParser } from '../src/UnifiedTextParser.js';
+import { FlexibleParser } from '../src/FlexibleParser.js';
+import { AdvancedParser } from '../src/AdvancedParser.js';
+import { defaultSyntaxRules } from '../src/config/syntaxRules.js';
+import { DEFAULT_VALIDATION_RULES } from '../src/config/validationRules.js';
+import { DocxParser } from '../src/DocxParser.js';
+import { AutoTrainer } from '../src/AutoTrainer.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -47,7 +47,7 @@ class CLIParser {
       totalErrors: 0,
       totalWarnings: 0,
       unknownPatterns: 0,
-      processingTime: 0
+      processingTime: 0,
     };
   }
 
@@ -66,28 +66,28 @@ class CLIParser {
     
     try {
       switch (command) {
-        case 'parse':
-          await this.parseCommand(args.slice(1));
-          break;
-        case 'validate':
-          await this.validateCommand(args.slice(1));
-          break;
-        case 'train':
-          await this.trainCommand(args.slice(1));
-          break;
-        case 'test':
-          await this.testCommand(args.slice(1));
-          break;
-        case 'auto-train':
-          await this.autoTrainCommand(args.slice(1));
-          break;
-        case 'help':
-          this.printUsage();
-          break;
-        default:
-          console.error(`Unknown command: ${command}`);
-          this.printUsage();
-          process.exit(1);
+      case 'parse':
+        await this.parseCommand(args.slice(1));
+        break;
+      case 'validate':
+        await this.validateCommand(args.slice(1));
+        break;
+      case 'train':
+        await this.trainCommand(args.slice(1));
+        break;
+      case 'test':
+        await this.testCommand(args.slice(1));
+        break;
+      case 'auto-train':
+        await this.autoTrainCommand(args.slice(1));
+        break;
+      case 'help':
+        this.printUsage();
+        break;
+      default:
+        console.error(`Unknown command: ${command}`);
+        this.printUsage();
+        process.exit(1);
       }
     } catch (error) {
       console.error('Error:', error.message);
@@ -152,7 +152,7 @@ class CLIParser {
     const result = this.parser.parse(fileData.content, source, {
       filename: basename(filePath),
       filepath: filePath,
-      ...fileData.metadata
+      ...fileData.metadata,
     });
 
     // Update metrics
@@ -163,7 +163,7 @@ class CLIParser {
       filename: basename(filePath),
       filepath: filePath,
       result: result,
-      originalMetadata: fileData.metadata
+      originalMetadata: fileData.metadata,
     });
     
     // Analyze for unknown patterns
@@ -210,8 +210,8 @@ class CLIParser {
           source: 'docx',
           structuredContent: result.structuredContent,
           rawText: result.rawText,
-          html: result.html
-        }
+          html: result.html,
+        },
       };
     }
     
@@ -219,8 +219,8 @@ class CLIParser {
     return {
       content: readFileSync(filePath, 'utf8'),
       metadata: {
-        source: 'text'
-      }
+        source: 'text',
+      },
     };
   }
 
@@ -273,7 +273,7 @@ class CLIParser {
         unknownLines.push({
           lineNumber,
           content,
-          analysis: this.analyzeUnknownLine(content)
+          analysis: this.analyzeUnknownLine(content),
         });
       }
     });
@@ -309,13 +309,13 @@ class CLIParser {
       hasEquals: content.includes('='),
       hasParentheses: /\([^)]*\)/.test(content),
       hasKeywords: false,
-      potentialType: 'unknown'
+      potentialType: 'unknown',
     };
 
     // Check for known keywords
     const keywords = ['SCHRITT', 'STAP', 'STEP', 'RUST', 'RUHE', 'IDLE', 'TIJD', 'TIME', 'ZEIT'];
     analysis.hasKeywords = keywords.some(keyword => 
-      content.toUpperCase().includes(keyword.toUpperCase())
+      content.toUpperCase().includes(keyword.toUpperCase()),
     );
 
     // Determine potential type
@@ -345,7 +345,7 @@ class CLIParser {
       suggestedRegex: null,
       suggestedGroup: null,
       confidence: 0,
-      reasoning: []
+      reasoning: [],
     };
 
     // Generate suggestions based on analysis
@@ -390,13 +390,13 @@ class CLIParser {
         filename: fileBasename,
         source: result.parsingMetadata?.source || 'unknown',
         timestamp: new Date().toISOString(),
-        version: '1.0.0'
+        version: '1.0.0',
       },
       program: {
         name: fileBasename,
         steps: result.steps,
         variables: result.variables,
-        crossReferences: result.crossReferences || []
+        crossReferences: result.crossReferences || [],
       },
       validation: {
         errors: result.errors,
@@ -405,21 +405,21 @@ class CLIParser {
           totalSteps: result.steps.length,
           totalVariables: result.variables.length,
           errorCount: result.errors.length,
-          warningCount: result.warnings.length
-        }
-      }
+          warningCount: result.warnings.length,
+        },
+      },
     };
     
     writeFileSync(
       join(outputDir, `${fileBasename}.json`),
-      JSON.stringify(jsonOutput, null, 2)
+      JSON.stringify(jsonOutput, null, 2),
     );
 
     // Write XML output (TIA Portal compatible)
     const xmlOutput = this.generateTiaXml(result, fileBasename);
     writeFileSync(
       join(outputDir, `${fileBasename}.xml`),
-      xmlOutput
+      xmlOutput,
     );
 
     console.log(`📄 Generated outputs for: ${fileBasename}`);
@@ -551,14 +551,14 @@ class CLIParser {
           steps: file.result.steps ? file.result.steps.length : 0,
           variables: file.result.variables ? file.result.variables.length : 0,
           errors: file.result.errors ? file.result.errors.length : 0,
-          warnings: file.result.warnings ? file.result.warnings.length : 0
-        }
+          warnings: file.result.warnings ? file.result.warnings.length : 0,
+        },
       })),
       distributions: {
         stepTypes: this.calculateStepTypeDistribution(),
         variableTypes: this.calculateVariableTypeDistribution(),
-        errorTypes: this.calculateErrorTypeDistribution()
-      }
+        errorTypes: this.calculateErrorTypeDistribution(),
+      },
     };
     
     return JSON.stringify(metrics, null, 2);
@@ -571,7 +571,7 @@ class CLIParser {
     const suggestions = {
       pendingSuggestions: this.pendingSuggestions,
       syntaxRuleUpdates: this.generateSyntaxRuleUpdates(),
-      trainingRecommendations: this.generateTrainingRecommendations()
+      trainingRecommendations: this.generateTrainingRecommendations(),
     };
     
     return JSON.stringify(suggestions, null, 2);
@@ -655,7 +655,7 @@ class CLIParser {
           suggestedRegex: highConfidenceSuggestions[0].suggestedRegex,
           examples: highConfidenceSuggestions.map(s => s.originalLine).slice(0, 3),
           confidence: Math.max(...highConfidenceSuggestions.map(s => s.confidence)),
-          comment: `Auto-generated from ${highConfidenceSuggestions.length} similar patterns`
+          comment: `Auto-generated from ${highConfidenceSuggestions.length} similar patterns`,
         });
       }
     });
@@ -676,7 +676,7 @@ class CLIParser {
         recommendations.push({
           type: 'error_pattern',
           description: `High frequency of ${type} errors (${count} occurrences)`,
-          suggestion: `Consider adding validation rules or improving pattern matching for ${type}`
+          suggestion: `Consider adding validation rules or improving pattern matching for ${type}`,
         });
       }
     });
@@ -686,7 +686,7 @@ class CLIParser {
       recommendations.push({
         type: 'unknown_patterns',
         description: `Found ${this.metrics.unknownPatterns} unknown patterns`,
-        suggestion: 'Consider expanding syntax rules to handle these patterns'
+        suggestion: 'Consider expanding syntax rules to handle these patterns',
       });
     }
     
@@ -729,7 +729,7 @@ class CLIParser {
       syntaxRules: this.syntaxRules,
       validationRules: this.validationRules,
       suggestions: this.pendingSuggestions,
-      recommendations: this.generateTrainingRecommendations()
+      recommendations: this.generateTrainingRecommendations(),
     };
   }
 
@@ -765,7 +765,7 @@ class CLIParser {
       validationRules: { ...this.validationRules },
       pendingSuggestions: this.pendingSuggestions,
       updates: updates,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
     
     // Apply high-confidence updates
@@ -800,7 +800,7 @@ class CLIParser {
       testFile: testFile,
       results: this.processedFiles[0]?.result || null,
       passed: this.metrics.totalErrors === 0,
-      metrics: this.metrics
+      metrics: this.metrics,
     };
     
     writeFileSync('./test-report.json', JSON.stringify(testReport, null, 2));
@@ -851,7 +851,7 @@ class CLIParser {
       maxIterations,
       minConfidence,
       convergenceThreshold: 0.05,
-      backupOriginalRules: true
+      backupOriginalRules: true,
     });
     
     // Start training
@@ -871,7 +871,7 @@ class CLIParser {
     const finalValidationRulesPath = join(outputDir, 'optimized-validation-rules.json');
     writeFileSync(finalValidationRulesPath, JSON.stringify(this.validationRules, null, 2));
     
-    console.log(`💾 Final optimized rules saved:`);
+    console.log('💾 Final optimized rules saved:');
     console.log(`  - ${finalRulesPath}`);
     console.log(`  - ${finalValidationRulesPath}`);
     

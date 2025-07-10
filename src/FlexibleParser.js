@@ -34,7 +34,7 @@ export class FlexibleParser {
       version: '1.0.0',
       parser: 'FlexibleParser',
       normalizedLineCount: text.split('\n').length,
-      originalLineCount: text.split('\n').length
+      originalLineCount: text.split('\n').length,
     };
     
     return validatedResult;
@@ -47,7 +47,7 @@ export class FlexibleParser {
     const validatedResult = {
       ...result,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     // Validate steps with flexible rules
@@ -80,7 +80,7 @@ export class FlexibleParser {
       result.errors.push({
         type: 'INVALID_STEP_NUMBER',
         message: `Step number cannot be negative: ${step.number}`,
-        lineNumber: step.lineNumber
+        lineNumber: step.lineNumber,
       });
     }
 
@@ -89,7 +89,7 @@ export class FlexibleParser {
       result.warnings.push({
         type: 'EMPTY_STEP_DESCRIPTION',
         message: `Step ${step.type} ${step.number} has no description`,
-        lineNumber: step.lineNumber
+        lineNumber: step.lineNumber,
       });
     }
   }
@@ -105,16 +105,16 @@ export class FlexibleParser {
     if (!crossRef.program || crossRef.program.trim().length === 0) {
       result.warnings.push({
         type: 'EMPTY_PROGRAM_REFERENCE',
-        message: `Cross-reference has empty program name`,
-        lineNumber: crossRef.lineNumber
+        message: 'Cross-reference has empty program name',
+        lineNumber: crossRef.lineNumber,
       });
     }
 
     if (!crossRef.steps || crossRef.steps.length === 0) {
       result.warnings.push({
         type: 'EMPTY_STEP_REFERENCE',
-        message: `Cross-reference has no step numbers`,
-        lineNumber: crossRef.lineNumber
+        message: 'Cross-reference has no step numbers',
+        lineNumber: crossRef.lineNumber,
       });
     }
   }
@@ -127,8 +127,8 @@ export class FlexibleParser {
     if (!variable.name || variable.name.trim().length === 0) {
       result.errors.push({
         type: 'EMPTY_VARIABLE_NAME',
-        message: `Variable has empty name`,
-        lineNumber: variable.lineNumber
+        message: 'Variable has empty name',
+        lineNumber: variable.lineNumber,
       });
     }
   }

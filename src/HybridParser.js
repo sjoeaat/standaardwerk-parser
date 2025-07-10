@@ -23,7 +23,7 @@ export class HybridParser extends HierarchicalParser {
     const normalizedText = this.preProcessEmbeddedKeywords(text, source);
     this.log('📝 Pre-processed text', { 
       originalLines: text.split('\n').length,
-      normalizedLines: normalizedText.split('\n').length 
+      normalizedLines: normalizedText.split('\n').length, 
     });
     
     // Step 2: Apply hierarchical parsing to normalized text
@@ -64,7 +64,7 @@ export class HybridParser extends HierarchicalParser {
       if (embeddedMatches.length > 0) {
         this.log('🔍 Found embedded SCHRITT references', { 
           line: line.substring(0, 60),
-          matches: embeddedMatches.length 
+          matches: embeddedMatches.length, 
         });
         
         // These are cross-references, not step declarations - keep as single line
@@ -83,14 +83,14 @@ export class HybridParser extends HierarchicalParser {
               /^(SETZEN|RÜCKSETZEN|SET|RESET)/i.test(before.trim())) {
             
             this.log('⚠️ Skipping split - SCHRITT in variable context', {
-              line: line.trim().substring(0, 60)
+              line: line.trim().substring(0, 60),
             });
             processedLines.push(line);
           } else {
             this.log('✂️ Splitting embedded SCHRITT declaration', {
               before: before.trim(),
               step: `${keyword} ${number}`,
-              after: after
+              after: after,
             });
             
             // Split into separate lines
@@ -239,7 +239,7 @@ export class HybridParser extends HierarchicalParser {
         program: program.trim(),
         steps: steps,
         lineNumber: node.lineNumber,
-        originalText: node.content
+        originalText: node.content,
       };
       
       result.crossReferences.push(crossRef);
@@ -262,7 +262,7 @@ export class HybridParser extends HierarchicalParser {
         name: name.trim(),
         value: value.trim() || undefined,
         lineNumber: node.lineNumber,
-        type: this.determineVariableType(name.trim())
+        type: this.determineVariableType(name.trim()),
       };
       
       result.variables.push(variable);

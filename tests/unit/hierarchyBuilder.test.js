@@ -10,14 +10,14 @@ describe('hierarchyBuilder', () => {
       expect(result).toEqual({
         name: null,
         children: {},
-        programs: []
+        programs: [],
       });
     });
     
     test('should place programs without folderPath at root', () => {
       const programs = [
         { name: 'Program1', folderPath: [] },
-        { name: 'Program2' } // No folderPath property
+        { name: 'Program2' }, // No folderPath property
       ];
       
       const result = buildFolderTree(programs);
@@ -31,7 +31,7 @@ describe('hierarchyBuilder', () => {
     test('should create single-level folder structure', () => {
       const programs = [
         { name: 'Program1', folderPath: ['Folder1'] },
-        { name: 'Program2', folderPath: ['Folder2'] }
+        { name: 'Program2', folderPath: ['Folder2'] },
       ];
       
       const result = buildFolderTree(programs);
@@ -45,7 +45,7 @@ describe('hierarchyBuilder', () => {
     
     test('should create multi-level nested folder structure', () => {
       const programs = [
-        { name: 'Program1', folderPath: ['Level1', 'Level2', 'Level3'] }
+        { name: 'Program1', folderPath: ['Level1', 'Level2', 'Level3'] },
       ];
       
       const result = buildFolderTree(programs);
@@ -60,7 +60,7 @@ describe('hierarchyBuilder', () => {
       const programs = [
         { name: 'Program1', folderPath: ['Shared', 'Folder'] },
         { name: 'Program2', folderPath: ['Shared', 'Folder'] },
-        { name: 'Program3', folderPath: ['Shared', 'Folder'] }
+        { name: 'Program3', folderPath: ['Shared', 'Folder'] },
       ];
       
       const result = buildFolderTree(programs);
@@ -75,7 +75,7 @@ describe('hierarchyBuilder', () => {
         { name: 'RootProgram', folderPath: [] },
         { name: 'Level1Program', folderPath: ['Level1'] },
         { name: 'DeepProgram', folderPath: ['Level1', 'Level2', 'Level3'] },
-        { name: 'AnotherLevel1', folderPath: ['AnotherFolder'] }
+        { name: 'AnotherLevel1', folderPath: ['AnotherFolder'] },
       ];
       
       const result = buildFolderTree(programs);
@@ -88,7 +88,7 @@ describe('hierarchyBuilder', () => {
     
     test('should create proper node structure for each folder', () => {
       const programs = [
-        { name: 'Program1', folderPath: ['Folder1', 'SubFolder'] }
+        { name: 'Program1', folderPath: ['Folder1', 'SubFolder'] },
       ];
       
       const result = buildFolderTree(programs);
@@ -118,7 +118,7 @@ describe('hierarchyBuilder', () => {
         { name: 'Pump Control', folderPath: ['1. System', '1.2 Monitoring', '1.2.2 Pumps'] },
         { name: 'Safety System', folderPath: ['2. Safety'] },
         { name: 'Emergency Stop', folderPath: ['2. Safety', '2.1 Emergency'] },
-        { name: 'Global Config', folderPath: [] }
+        { name: 'Global Config', folderPath: [] },
       ];
       
       const result = buildFolderTree(programs);
@@ -149,7 +149,7 @@ describe('hierarchyBuilder', () => {
         { name: 'Program1', folderPath: [] },
         { name: 'Program2', folderPath: null },
         { name: 'Program3', folderPath: undefined },
-        { name: 'Program4' }
+        { name: 'Program4' },
       ];
       
       const result = buildFolderTree(programs);
@@ -160,7 +160,7 @@ describe('hierarchyBuilder', () => {
     
     test('should not mutate input programs', () => {
       const programs = [
-        { name: 'Program1', folderPath: ['Folder1'] }
+        { name: 'Program1', folderPath: ['Folder1'] },
       ];
       const originalPrograms = JSON.parse(JSON.stringify(programs));
       
@@ -171,7 +171,7 @@ describe('hierarchyBuilder', () => {
     
     test('should handle folder names with special characters', () => {
       const programs = [
-        { name: 'Program1', folderPath: ['Folder-1', 'Sub_Folder.2', 'Level (3)'] }
+        { name: 'Program1', folderPath: ['Folder-1', 'Sub_Folder.2', 'Level (3)'] },
       ];
       
       const result = buildFolderTree(programs);
@@ -184,7 +184,7 @@ describe('hierarchyBuilder', () => {
     test('should handle duplicate programs gracefully', () => {
       const programs = [
         { name: 'Program1', folderPath: ['Folder1'] },
-        { name: 'Program1', folderPath: ['Folder1'] } // Duplicate
+        { name: 'Program1', folderPath: ['Folder1'] }, // Duplicate
       ];
       
       const result = buildFolderTree(programs);

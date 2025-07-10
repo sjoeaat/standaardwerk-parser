@@ -12,7 +12,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
       crossRefWithFB: /(.+?)\s*\(([^)]+)\s+(FB\d+)\s+(SCHRITT|STAP|STEP)\s+([0-9+]+)\)/i,
       timerPattern: /(ZEIT|TIME|TIJD)\s+(\d+)(sek|sec|s|min|m|h)\s*\?\?/i,
       storingPattern: /^(STORING|MELDING):\s*(.+)\s*=\s*(.*)$/,
-      conditionPattern: /^-\s*(.+)$/
+      conditionPattern: /^-\s*(.+)$/,
     };
   }
 
@@ -30,7 +30,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
       crossReferences: baseResult.crossReferences || [],
       timers: baseResult.timers || [],
       conditions: baseResult.conditions || [],
-      storings: baseResult.storings || []
+      storings: baseResult.storings || [],
     };
 
     lines.forEach((line, index) => {
@@ -42,7 +42,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
       if (stepMatch) {
         const stepExists = result.steps.some(step => 
           step.type === stepMatch[1].toUpperCase() && 
-          step.number === parseInt(stepMatch[3] || '0')
+          step.number === parseInt(stepMatch[3] || '0'),
         );
         
         if (!stepExists) {
@@ -52,7 +52,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
             description: stepMatch[4],
             line: index + 1,
             conditions: [],
-            source: 'training-enhanced'
+            source: 'training-enhanced',
           });
         }
       }
@@ -61,7 +61,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
       const variableMatch = trimmed.match(this.trainingPatterns.variablePattern);
       if (variableMatch && !trimmed.includes('SCHRITT')) {
         const variableExists = result.variables.some(variable => 
-          variable.name === variableMatch[1].trim()
+          variable.name === variableMatch[1].trim(),
         );
         
         if (!variableExists) {
@@ -69,7 +69,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
             name: variableMatch[1].trim(),
             value: variableMatch[2].trim(),
             line: index + 1,
-            source: 'training-enhanced'
+            source: 'training-enhanced',
           });
         }
       }
@@ -84,7 +84,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
           stepType: crossRefMatch[4],
           stepNumbers: crossRefMatch[5],
           line: index + 1,
-          source: 'training-enhanced'
+          source: 'training-enhanced',
         });
       }
 
@@ -97,7 +97,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
           unit: timerMatch[3],
           pattern: trimmed,
           line: index + 1,
-          source: 'training-enhanced'
+          source: 'training-enhanced',
         });
       }
 
@@ -109,7 +109,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
           description: storingMatch[2].trim(),
           value: storingMatch[3].trim(),
           line: index + 1,
-          source: 'training-enhanced'
+          source: 'training-enhanced',
         });
       }
 
@@ -119,7 +119,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
         result.conditions.push({
           condition: conditionMatch[1].trim(),
           line: index + 1,
-          source: 'training-enhanced'
+          source: 'training-enhanced',
         });
       }
     });
@@ -130,8 +130,8 @@ export class TrainingEnhancedParser extends AdvancedParser {
         stepDetection: { accuracy: 100.0, applied: result.steps.filter(s => s.source === 'training-enhanced').length },
         variableDetection: { accuracy: 100.0, applied: result.variables.filter(v => v.source === 'training-enhanced').length },
         crossReference: { accuracy: 85.7, applied: result.crossReferences.filter(c => c.source === 'training-enhanced').length },
-        timerDetection: { accuracy: 100.0, applied: result.timers.filter(t => t.source === 'training-enhanced').length }
-      }
+        timerDetection: { accuracy: 100.0, applied: result.timers.filter(t => t.source === 'training-enhanced').length },
+      },
     };
 
     return result;
@@ -142,7 +142,7 @@ export class TrainingEnhancedParser extends AdvancedParser {
       steps: { expected: 16, actual: result.steps.length },
       variables: { expected: 14, actual: result.variables.length },
       crossReferences: { expected: 7, actual: result.crossReferences.length },
-      timers: { expected: 5, actual: result.timers.length }
+      timers: { expected: 5, actual: result.timers.length },
     };
 
     Object.keys(validation).forEach(key => {

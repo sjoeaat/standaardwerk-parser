@@ -19,7 +19,7 @@ export class AutoTrainer {
       minConfidence: options.minConfidence || 0.8,
       convergenceThreshold: options.convergenceThreshold || 0.05,
       backupOriginalRules: options.backupOriginalRules !== false,
-      ...options
+      ...options,
     };
     
     this.trainingHistory = [];
@@ -82,7 +82,7 @@ export class AutoTrainer {
         metrics,
         suggestions,
         appliedCount,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       
       previousMetrics = metrics;
@@ -100,7 +100,7 @@ export class AutoTrainer {
       converged: this.converged,
       finalMetrics: previousMetrics,
       trainingHistory: this.trainingHistory,
-      reportPath: finalReport
+      reportPath: finalReport,
     };
   }
 
@@ -125,7 +125,7 @@ export class AutoTrainer {
         totalErrors: 0,
         totalWarnings: 0,
         unknownPatterns: 0,
-        processingTime: 0
+        processingTime: 0,
       };
       
       await this.cliParser.parseFile(file, iterationDir);
@@ -134,7 +134,7 @@ export class AutoTrainer {
         filename: file,
         metrics: { ...this.cliParser.metrics },
         suggestions: [...this.cliParser.pendingSuggestions],
-        processedFiles: [...this.cliParser.processedFiles]
+        processedFiles: [...this.cliParser.processedFiles],
       });
     }
     
@@ -170,7 +170,7 @@ export class AutoTrainer {
       errorRate,
       warningRate,
       unknownPatternRate,
-      parsingEfficiency
+      parsingEfficiency,
     };
   }
 
@@ -198,7 +198,7 @@ export class AutoTrainer {
     
     // Filter by confidence threshold
     const highConfidenceSuggestions = allSuggestions.filter(s => 
-      s.confidence >= this.options.minConfidence
+      s.confidence >= this.options.minConfidence,
     );
     
     // Group similar suggestions
@@ -223,7 +223,7 @@ export class AutoTrainer {
         groups.set(key, {
           ...suggestion,
           frequency: 1,
-          examples: [suggestion.originalLine]
+          examples: [suggestion.originalLine],
         });
       } else {
         const group = groups.get(key);
@@ -300,7 +300,7 @@ export class AutoTrainer {
       pattern: suggestion.suggestedRegex,
       description: `Auto-learned from ${suggestion.frequency} examples`,
       confidence: suggestion.confidence,
-      examples: suggestion.examples
+      examples: suggestion.examples,
     };
     
     rules.stepPatterns.push(newPattern);
@@ -313,20 +313,20 @@ export class AutoTrainer {
     // Enhance variable detection patterns
     if (!validationRules.groups.autoLearned) {
       validationRules.groups.autoLearned = {
-        name: "AutoLearned",
-        description: "Automatically learned patterns",
+        name: 'AutoLearned',
+        description: 'Automatically learned patterns',
         patterns: [],
         implementation: {
-          type: "coil",
-          dataType: "Bool",
-          arrayName: "AutoLearned",
-          arrayRange: [1, 50]
+          type: 'coil',
+          dataType: 'Bool',
+          arrayName: 'AutoLearned',
+          arrayRange: [1, 50],
         },
         validation: {
           requiresConditions: false,
           allowsSetResetTable: true,
-          maxConditions: 10
-        }
+          maxConditions: 10,
+        },
       };
     }
     
@@ -347,7 +347,7 @@ export class AutoTrainer {
     const newPattern = {
       pattern: suggestion.suggestedRegex,
       type: suggestion.potentialType,
-      confidence: suggestion.confidence
+      confidence: suggestion.confidence,
     };
     
     rules.conditionPatterns.push(newPattern);
@@ -365,13 +365,13 @@ export class AutoTrainer {
     // Save syntax rules
     writeFileSync(
       join(rulesDir, 'updated-syntax-rules.json'),
-      JSON.stringify(syntaxRules, null, 2)
+      JSON.stringify(syntaxRules, null, 2),
     );
     
     // Save validation rules
     writeFileSync(
       join(rulesDir, 'updated-validation-rules.json'),
-      JSON.stringify(validationRules, null, 2)
+      JSON.stringify(validationRules, null, 2),
     );
     
     console.log(`💾 Updated rules saved to ${rulesDir}`);
@@ -388,12 +388,12 @@ export class AutoTrainer {
     
     writeFileSync(
       join(backupDir, 'original-syntax-rules.json'),
-      JSON.stringify(this.cliParser.syntaxRules, null, 2)
+      JSON.stringify(this.cliParser.syntaxRules, null, 2),
     );
     
     writeFileSync(
       join(backupDir, 'original-validation-rules.json'),
-      JSON.stringify(this.cliParser.validationRules, null, 2)
+      JSON.stringify(this.cliParser.validationRules, null, 2),
     );
     
     console.log(`💾 Original rules backed up to ${backupDir}`);
@@ -413,14 +413,14 @@ export class AutoTrainer {
         minConfidence: this.options.minConfidence,
         convergenceThreshold: this.options.convergenceThreshold,
         trainingStarted: this.trainingHistory[0]?.timestamp,
-        trainingCompleted: new Date().toISOString()
+        trainingCompleted: new Date().toISOString(),
       },
       
       progressMetrics: this.trainingHistory.map(h => ({
         iteration: h.iteration,
         metrics: h.metrics,
         appliedSuggestions: h.appliedCount,
-        timestamp: h.timestamp
+        timestamp: h.timestamp,
       })),
       
       finalMetrics: this.trainingHistory[this.trainingHistory.length - 1]?.metrics,
@@ -429,7 +429,7 @@ export class AutoTrainer {
       
       bestSuggestions: this.getBestSuggestions(),
       
-      recommendations: this.generateRecommendations()
+      recommendations: this.generateRecommendations(),
     };
     
     writeFileSync(reportPath, JSON.stringify(report, null, 2));
@@ -450,7 +450,7 @@ export class AutoTrainer {
       parsingEfficiencyImprovement: last.parsingEfficiency - first.parsingEfficiency,
       errorRateReduction: first.errorRate - last.errorRate,
       unknownPatternReduction: first.unknownPatternRate - last.unknownPatternRate,
-      totalSuggestionsApplied: this.trainingHistory.reduce((sum, h) => sum + h.appliedCount, 0)
+      totalSuggestionsApplied: this.trainingHistory.reduce((sum, h) => sum + h.appliedCount, 0),
     };
   }
 
@@ -467,7 +467,7 @@ export class AutoTrainer {
         suggestedGroup: s.suggestedGroup,
         confidence: s.confidence,
         frequency: s.frequency,
-        examples: s.examples.slice(0, 3)
+        examples: s.examples.slice(0, 3),
       }));
   }
 
@@ -481,7 +481,7 @@ export class AutoTrainer {
       recommendations.push({
         type: 'convergence',
         message: 'Training did not converge. Consider increasing max iterations or adjusting convergence threshold.',
-        priority: 'high'
+        priority: 'high',
       });
     }
     
@@ -491,7 +491,7 @@ export class AutoTrainer {
       recommendations.push({
         type: 'error_rate',
         message: 'High error rate detected. Consider manual review of validation rules.',
-        priority: 'medium'
+        priority: 'medium',
       });
     }
     
@@ -499,7 +499,7 @@ export class AutoTrainer {
       recommendations.push({
         type: 'unknown_patterns',
         message: 'Many unknown patterns remain. Consider expanding training data or manual rule creation.',
-        priority: 'medium'
+        priority: 'medium',
       });
     }
     
