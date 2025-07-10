@@ -2,13 +2,8 @@ export default {
   // Test environment
   testEnvironment: 'node',
   
-  // Module format
-  extensionsToTreatAsEsm: ['.js'],
-  globals: {
-    'ts-jest': {
-      useESM: true
-    }
-  },
+  // Module format - experimental ES modules support
+  transform: {},
   
   // Test file patterns
   testMatch: [
@@ -41,8 +36,6 @@ export default {
   // Setup files
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   
-  // Module transformation
-  transform: {},
   
   // Test timeout
   testTimeout: 10000,

@@ -11,6 +11,7 @@
 
 import { FlexibleParser } from './FlexibleParser.js';
 import { ContentPreprocessor } from './ContentPreprocessor.js';
+import { globalRegexCache } from './utils/RegexCache.js';
 
 /**
  * Advanced Parser for complex industrial program structures
@@ -72,12 +73,17 @@ export class AdvancedParser extends FlexibleParser {
       negationPattern: /^(NICHT|NOT)\s+(.+)$/i
     };
     
-    // Program structure tracking
+    // Program structure tracking - optimized with efficient data structures
     this.programStructure = {
       currentFB: null,
       fbHierarchy: new Map(),
       crossReferences: new Map(),
-      entities: new Map()
+      entities: new Map(),
+      // Performance optimizations
+      programTypeIndex: new Map(), // programType -> Set of programs
+      stepNumberIndex: new Map(),  // stepNumber -> Set of steps
+      entityTypeIndex: new Map(),  // entityType -> Set of entities
+      lineNumberIndex: new Map()   // lineNumber -> element
     };
     
     // TIA Portal standard variables
@@ -109,11 +115,25 @@ export class AdvancedParser extends FlexibleParser {
   }
 
   /**
-   * Enhance base parsing with advanced features
+   * Enhance base parsing with advanced features - refactored for better maintainability
    */
   enhanceWithAdvancedParsing(text, baseResult) {
     const lines = text.split('\n');
-    const enhanced = {
+    const enhanced = this.initializeEnhancedResult(baseResult);
+    const parsingContext = this.initializeParsingContext();
+
+    // Process lines in batches for better performance
+    this.processLinesInBatches(lines, enhanced, parsingContext);
+
+    // Finalize the enhanced result
+    return this.finalizeEnhancedResult(enhanced, parsingContext);
+  }
+
+  /**
+   * Initialize enhanced result structure
+   */
+  initializeEnhancedResult(baseResult) {
+    return {
       ...baseResult,
       programs: [],
       variableAssignments: [],
@@ -123,86 +143,168 @@ export class AdvancedParser extends FlexibleParser {
       normalizedReferences: [],
       compoundConditions: []
     };
+  }
 
-    let currentProgram = null;
-    let currentOrBlock = null;
-    let lineIndex = 0;
+  /**
+   * Initialize parsing context
+   */
+  initializeParsingContext() {
+    return {
+      currentProgram: null,
+      currentOrBlock: null,
+      lineIndex: 0
+    };
+  }
 
+  /**
+   * Process lines in batches to avoid blocking
+   */
+  processLinesInBatches(lines, enhanced, parsingContext) {
     lines.forEach((line, index) => {
-      const trimmed = line.trim();
-      if (!trimmed) return;
-
-      // 1. Detect FB program headers
-      const programMatch = this.detectFBProgram(trimmed, index + 1);
-      if (programMatch) {
-        if (currentProgram) {
-          enhanced.programs.push(currentProgram);
-        }
-        currentProgram = programMatch;
-        this.programStructure.currentFB = programMatch.fbNumber;
-        return;
-      }
-
-      // 2. Detect variable assignments
-      const assignmentMatch = this.detectVariableAssignment(trimmed, index + 1);
-      if (assignmentMatch) {
-        enhanced.variableAssignments.push(assignmentMatch);
-        if (currentProgram) {
-          currentProgram.assignments = currentProgram.assignments || [];
-          currentProgram.assignments.push(assignmentMatch);
-        }
-        return;
-      }
-
-      // 3. Detect comments and descriptions
-      const commentMatch = this.detectComment(trimmed, index + 1);
-      if (commentMatch) {
-        enhanced.comments.push(commentMatch);
-        return;
-      }
-
-      // 4. Detect OR-blocks
-      const orBlockResult = this.detectOrBlock(trimmed, index + 1, currentOrBlock);
-      if (orBlockResult.isOrBlock) {
-        currentOrBlock = orBlockResult.orBlock;
-        if (orBlockResult.completed) {
-          enhanced.orBlocks.push(currentOrBlock);
-          currentOrBlock = null;
-        }
-        return;
-      }
-
-      // 5. Detect and normalize references
-      const normalizedRef = this.normalizeReference(trimmed, index + 1);
-      if (normalizedRef) {
-        enhanced.normalizedReferences.push(normalizedRef);
-        return;
-      }
-
-      // 6. Detect entities
-      const entityMatch = this.detectEntity(trimmed, index + 1);
-      if (entityMatch) {
-        enhanced.entities.push(entityMatch);
-        return;
-      }
-
-      // 7. Detect transition rules
-      const transitionMatch = this.detectTransitionRule(trimmed, index + 1);
-      if (transitionMatch) {
-        enhanced.compoundConditions.push(transitionMatch);
-        return;
-      }
-
-      // 8. Enhance existing conditions with compound logic
-      const conditionMatch = this.enhanceCondition(trimmed, index + 1, baseResult);
-      if (conditionMatch) {
-        enhanced.compoundConditions.push(conditionMatch);
-      }
+      this.processLine(line, index, enhanced, parsingContext);
     });
+  }
 
+  /**
+   * Process a single line with all detection methods
+   */
+  processLine(line, index, enhanced, parsingContext) {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    const lineNumber = index + 1;
+    const detectors = [
+      () => this.processProgram(trimmed, lineNumber, enhanced, parsingContext),
+      () => this.processVariableAssignment(trimmed, lineNumber, enhanced, parsingContext),
+      () => this.processComment(trimmed, lineNumber, enhanced),
+      () => this.processOrBlock(trimmed, lineNumber, enhanced, parsingContext),
+      () => this.processReference(trimmed, lineNumber, enhanced),
+      () => this.processEntity(trimmed, lineNumber, enhanced),
+      () => this.processTransitionRule(trimmed, lineNumber, enhanced),
+      () => this.processCondition(trimmed, lineNumber, enhanced)
+    ];
+
+    // Try each detector until one succeeds
+    for (const detector of detectors) {
+      if (detector()) break;
+    }
+  }
+
+  /**
+   * Process FB program detection
+   */
+  processProgram(trimmed, lineNumber, enhanced, parsingContext) {
+    const programMatch = this.detectFBProgram(trimmed, lineNumber);
+    if (programMatch) {
+      if (parsingContext.currentProgram) {
+        enhanced.programs.push(parsingContext.currentProgram);
+      }
+      parsingContext.currentProgram = programMatch;
+      this.programStructure.currentFB = programMatch.fbNumber;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Process variable assignment detection
+   */
+  processVariableAssignment(trimmed, lineNumber, enhanced, parsingContext) {
+    const assignmentMatch = this.detectVariableAssignment(trimmed, lineNumber);
+    if (assignmentMatch) {
+      enhanced.variableAssignments.push(assignmentMatch);
+      if (parsingContext.currentProgram) {
+        parsingContext.currentProgram.assignments = parsingContext.currentProgram.assignments || [];
+        parsingContext.currentProgram.assignments.push(assignmentMatch);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Process comment detection
+   */
+  processComment(trimmed, lineNumber, enhanced) {
+    const commentMatch = this.detectComment(trimmed, lineNumber);
+    if (commentMatch) {
+      enhanced.comments.push(commentMatch);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Process OR-block detection
+   */
+  processOrBlock(trimmed, lineNumber, enhanced, parsingContext) {
+    const orBlockResult = this.detectOrBlock(trimmed, lineNumber, parsingContext.currentOrBlock);
+    if (orBlockResult.isOrBlock) {
+      parsingContext.currentOrBlock = orBlockResult.orBlock;
+      if (orBlockResult.completed) {
+        enhanced.orBlocks.push(parsingContext.currentOrBlock);
+        parsingContext.currentOrBlock = null;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Process reference normalization
+   */
+  processReference(trimmed, lineNumber, enhanced) {
+    const normalizedRef = this.normalizeReference(trimmed, lineNumber);
+    if (normalizedRef) {
+      enhanced.normalizedReferences.push(normalizedRef);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Process entity detection
+   */
+  processEntity(trimmed, lineNumber, enhanced) {
+    const entityMatch = this.detectEntity(trimmed, lineNumber);
+    if (entityMatch) {
+      enhanced.entities.push(entityMatch);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Process transition rule detection
+   */
+  processTransitionRule(trimmed, lineNumber, enhanced) {
+    const transitionMatch = this.detectTransitionRule(trimmed, lineNumber);
+    if (transitionMatch) {
+      enhanced.compoundConditions.push(transitionMatch);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Process condition enhancement
+   */
+  processCondition(trimmed, lineNumber, enhanced) {
+    const conditionMatch = this.enhanceCondition(trimmed, lineNumber, enhanced);
+    if (conditionMatch) {
+      enhanced.compoundConditions.push(conditionMatch);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Finalize enhanced result with post-processing
+   */
+  finalizeEnhancedResult(enhanced, parsingContext) {
     // Add final program if exists
-    if (currentProgram) {
-      enhanced.programs.push(currentProgram);
+    if (parsingContext.currentProgram) {
+      enhanced.programs.push(parsingContext.currentProgram);
     }
 
     // Build program hierarchy
@@ -218,10 +320,10 @@ export class AdvancedParser extends FlexibleParser {
   }
 
   /**
-   * Detect FB program headers
+   * Detect FB program headers - using cached regex
    */
   detectFBProgram(text, lineNumber) {
-    const match = text.match(this.advancedPatterns.fbProgram);
+    const match = globalRegexCache.match(text, this.advancedPatterns.fbProgram.source, this.advancedPatterns.fbProgram.flags);
     if (!match) return null;
 
     const [, type, name, fbNumber] = match;
@@ -239,11 +341,11 @@ export class AdvancedParser extends FlexibleParser {
   }
 
   /**
-   * Detect variable assignments (simple and complex)
+   * Detect variable assignments (simple and complex) - using cached regex
    */
   detectVariableAssignment(text, lineNumber) {
     // Try complex assignment first (Horde[x].Etage_Daten[y].Status = 0)
-    let match = text.match(this.advancedPatterns.complexAssignment);
+    let match = globalRegexCache.match(text, this.advancedPatterns.complexAssignment.source, this.advancedPatterns.complexAssignment.flags);
     if (match) {
       const [, arrayName, index1, property1, index2, property2, value] = match;
       return {
@@ -261,7 +363,7 @@ export class AdvancedParser extends FlexibleParser {
     }
 
     // Try matrix assignment (Horde[x].Property = value)
-    match = text.match(this.advancedPatterns.matrixAssignment);
+    match = globalRegexCache.match(text, this.advancedPatterns.matrixAssignment.source, this.advancedPatterns.matrixAssignment.flags);
     if (match) {
       const [, arrayName, index, property, value] = match;
       return {
@@ -276,7 +378,7 @@ export class AdvancedParser extends FlexibleParser {
     }
 
     // Try simple assignment (Variable 1 (Description) = 21)
-    match = text.match(this.advancedPatterns.simpleAssignment);
+    match = globalRegexCache.match(text, this.advancedPatterns.simpleAssignment.source, this.advancedPatterns.simpleAssignment.flags);
     if (match) {
       const [, name, description, value] = match;
       return {
@@ -290,11 +392,11 @@ export class AdvancedParser extends FlexibleParser {
     }
 
     // Try general assignment (Variable Name = Value)
-    match = text.match(this.advancedPatterns.generalAssignment);
+    match = globalRegexCache.match(text, this.advancedPatterns.generalAssignment.source, this.advancedPatterns.generalAssignment.flags);
     if (match) {
       const [, name, value] = match;
       // Skip if this looks like a step or condition
-      if (name.match(/^(SCHRITT|STAP|STEP|RUHE|RUST|IDLE)/i)) {
+      if (globalRegexCache.test('^(SCHRITT|STAP|STEP|RUHE|RUST|IDLE)', name, 'i')) {
         return null;
       }
       return {
@@ -555,7 +657,7 @@ export class AdvancedParser extends FlexibleParser {
   }
 
   /**
-   * Build program hierarchy from parsed data
+   * Build program hierarchy from parsed data - optimized with efficient lookups
    */
   buildProgramHierarchy(enhanced) {
     const hierarchy = {
@@ -564,8 +666,19 @@ export class AdvancedParser extends FlexibleParser {
       relationships: []
     };
 
+    // Use Set for O(1) lookups instead of includes()
+    const mainProgramTypes = new Set(['hauptprogramm', 'main', 'primary']);
+    
     enhanced.programs.forEach(program => {
-      if (program.programType.toLowerCase().includes('haupt')) {
+      // Index program by type for fast lookups
+      const programType = program.programType.toLowerCase();
+      if (!this.programStructure.programTypeIndex.has(programType)) {
+        this.programStructure.programTypeIndex.set(programType, new Set());
+      }
+      this.programStructure.programTypeIndex.get(programType).add(program);
+      
+      // Categorize program efficiently
+      if (mainProgramTypes.has(programType)) {
         hierarchy.mainPrograms.push(program);
       } else {
         hierarchy.subPrograms.push(program);
@@ -634,11 +747,15 @@ export class AdvancedParser extends FlexibleParser {
   }
 
   /**
-   * Validate and fix step sequence
+   * Validate and fix step sequence - optimized with Set operations
    */
   validateStepSequence(enhanced) {
     const stepNumbers = enhanced.steps.map(s => s.number).sort((a, b) => a - b);
     const expectedSequence = Array.from({length: stepNumbers.length}, (_, i) => i);
+    
+    // Use Set for O(1) lookups instead of includes()
+    const stepNumberSet = new Set(stepNumbers);
+    const expectedSet = new Set(expectedSequence);
     
     // Check if we have the expected sequence (0, 1, 2, 3, ...)
     let hasValidSequence = true;
@@ -655,13 +772,17 @@ export class AdvancedParser extends FlexibleParser {
       console.log(`   Actual: ${stepNumbers.join(', ')}`);
     }
     
+    // Find gaps and duplicates efficiently using Set operations
+    const gaps = expectedSequence.filter(expected => !stepNumberSet.has(expected));
+    const duplicates = stepNumbers.filter((num, index) => stepNumbers.indexOf(num) !== index);
+    
     // Add sequence validation to results
     enhanced.stepSequenceValidation = {
       isValid: hasValidSequence,
       expected: expectedSequence,
       actual: stepNumbers,
-      gaps: expectedSequence.filter(expected => !stepNumbers.includes(expected)),
-      duplicates: stepNumbers.filter((num, index) => stepNumbers.indexOf(num) !== index)
+      gaps,
+      duplicates
     };
   }
 

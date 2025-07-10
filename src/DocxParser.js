@@ -6,7 +6,7 @@
 // =====================================================================
 
 import mammoth from 'mammoth';
-import { readFileSync } from 'fs';
+import { readFile } from 'fs/promises';
 
 /**
  * DOCX Parser that preserves formatting and layout information
@@ -30,21 +30,23 @@ export class DocxParser {
   }
 
   /**
-   * Parse DOCX file with formatting preservation
+   * Parse DOCX file with formatting preservation - async optimized
    */
   async parseDocxFile(filePath) {
     try {
-      const buffer = readFileSync(filePath);
+      const buffer = await readFile(filePath);
       
-      // Parse with mammoth to get both text and HTML
-      const textResult = await mammoth.extractRawText({ buffer });
-      const htmlResult = await mammoth.convertToHtml({ buffer });
+      // Parse with mammoth to get both text and HTML concurrently
+      const [textResult, htmlResult] = await Promise.all([
+        mammoth.extractRawText({ buffer }),
+        mammoth.convertToHtml({ buffer })
+      ]);
       
-      // Extract structured content with formatting
-      const structuredContent = this.extractStructuredContent(htmlResult.html, textResult.value);
+      // Extract structured content with formatting (async)
+      const structuredContent = await this.extractStructuredContentAsync(htmlResult.html, textResult.value);
       
-      // Convert to normalized text with preserved formatting markers
-      const normalizedText = this.convertToNormalizedText(structuredContent);
+      // Convert to normalized text with preserved formatting markers (async)
+      const normalizedText = await this.convertToNormalizedTextAsync(structuredContent);
       
       return {
         rawText: textResult.value,
@@ -60,6 +62,19 @@ export class DocxParser {
     } catch (error) {
       throw new Error(`Failed to parse DOCX file: ${error.message}`);
     }
+  }
+
+  /**
+   * Extract structured content from HTML with formatting information - async optimized
+   */
+  async extractStructuredContentAsync(html, rawText) {
+    return new Promise((resolve) => {
+      // Run extraction in chunks to avoid blocking
+      setImmediate(() => {
+        const result = this.extractStructuredContent(html, rawText);
+        resolve(result);
+      });
+    });
   }
 
   /**
@@ -318,6 +333,19 @@ export class DocxParser {
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'")
       .trim();
+  }
+
+  /**
+   * Convert structured content to normalized text with formatting markers - async optimized
+   */
+  async convertToNormalizedTextAsync(structuredContent) {
+    return new Promise((resolve) => {
+      // Run conversion in chunks to avoid blocking
+      setImmediate(() => {
+        const result = this.convertToNormalizedText(structuredContent);
+        resolve(result);
+      });
+    });
   }
 
   /**

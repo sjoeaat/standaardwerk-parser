@@ -8,6 +8,8 @@
 // 4. OR-block structure preservation ([...] groupings)
 // =====================================================================
 
+import { globalRegexCache } from './utils/RegexCache.js';
+
 /**
  * Content Preprocessor for improving parsing accuracy
  */
@@ -25,6 +27,9 @@ export class ContentPreprocessor {
       '&ndash;': '–',
       '&mdash;': '—'
     };
+    
+    // Performance optimizations - use global regex cache
+    this.entityKeys = Object.keys(this.htmlEntities);
     
     // Patterns for context-aware parsing
     this.contextPatterns = {
@@ -82,26 +87,25 @@ export class ContentPreprocessor {
   }
 
   /**
-   * Decode HTML entities that remain from DOCX conversion
+   * Decode HTML entities that remain from DOCX conversion - optimized with global regex cache
    */
   decodeHtmlEntities(content) {
     let decoded = content;
     
-    // Replace known HTML entities
-    Object.entries(this.htmlEntities).forEach(([entity, replacement]) => {
-      const regex = new RegExp(entity, 'g');
-      decoded = decoded.replace(regex, replacement);
+    // Use global regex cache for better performance
+    this.entityKeys.forEach(entity => {
+      decoded = globalRegexCache.replace(decoded, entity, this.htmlEntities[entity], 'g');
     });
     
     // Handle numeric entities (&#123;)
-    decoded = decoded.replace(/&#(\d+);/g, (match, code) => {
+    decoded = globalRegexCache.replace(decoded, '&#(\\d+);', (match, code) => {
       return String.fromCharCode(parseInt(code));
-    });
+    }, 'g');
     
     // Handle hex entities (&#x1F;)
-    decoded = decoded.replace(/&#x([0-9A-Fa-f]+);/g, (match, hex) => {
+    decoded = globalRegexCache.replace(decoded, '&#x([0-9A-Fa-f]+);', (match, hex) => {
       return String.fromCharCode(parseInt(hex, 16));
-    });
+    }, 'g');
     
     return decoded;
   }
@@ -318,12 +322,12 @@ export class ContentPreprocessor {
   }
 
   /**
-   * Count HTML entities in content
+   * Count HTML entities in content - optimized with global regex cache
    */
   countHtmlEntities(content) {
     let count = 0;
-    Object.keys(this.htmlEntities).forEach(entity => {
-      const matches = content.match(new RegExp(entity, 'g'));
+    this.entityKeys.forEach(entity => {
+      const matches = globalRegexCache.match(content, entity, 'g');
       if (matches) count += matches.length;
     });
     return count;

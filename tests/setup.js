@@ -1,6 +1,8 @@
 // Jest setup file
 // Global test configuration and utilities
 
+import { jest } from '@jest/globals';
+
 // Increase timeout for complex parsing operations
 jest.setTimeout(10000);
 
@@ -63,6 +65,8 @@ global.testUtils = {
     }
   })
 };
+
+import { expect } from '@jest/globals';
 
 // Custom matchers
 expect.extend({
